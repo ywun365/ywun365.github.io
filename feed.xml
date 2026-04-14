@@ -6,8 +6,40 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Tue, 14 Apr 2026 11:04:53 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 14 Apr 2026 20:38:56 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>将Wordpress接入邮件发信平台</title>
+      <link>https://ywun365.github.io/post/connect-wordpress-to-email-platforms/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/connect-wordpress-to-email-platforms/</guid>
+      <pubDate>Tue, 14 Apr 2026 20:38:56 +0800</pubDate>
+      <description><![CDATA[<p>将 WordPress 接入发件平台，能方便地通过邮件验证的方式开放注册账号，让你的博客看起来更加专业；同时，当博客被评论、有新用户注册时，也能及时通过邮件发送到你的邮箱通知你。</p>
+<p>与营销邮件不同，这种邮件一般称作<strong>事务型邮件</strong>。事务型邮件是由用户行为自动触发、以一对一形式发送的功能性邮件，通常这种邮件被当作垃圾邮件的可能性更低，被拒收的次数也更少。</p>
+<p>对于轻度使用通知邮件的站点，这里推荐使用 <strong>Brevo</strong> 邮件发送平台。</p>
+<p>Brevo 平台给每位用户提供每天 300 封的发信额度，对于中小型网站来说，通常已经足够使用了。<br />
+如果网站有较大量的发信需求，这里也推荐 <strong>Zoho Zepto</strong> 平台和 <strong>Amazon SES</strong>，通常性价比会更高一些。</p>
+<p>这里以 <strong>Brevo</strong> 平台做演示。</p>
+<p>首先注册好一个 Brevo 平台账号。<br />
+如果 Brevo 注册过程中出现因网络原因导致的问题，或者验证相关问题，本文不提供相应方案，请自行解决。</p>
+<p>注册完成后，首先我们需要绑定一个自己的发信邮箱域名。点击右上角的齿轮 <strong>Settings</strong> 按钮，接着选择 <strong>Senders, domains, IPs</strong> 模块。</p>
+<p>选择 <strong>Domains</strong>，添加好一个域名。接着在你的域名 DNS 平台按照要求设置好对应的解析记录。</p>
+<p>等解析生效后，再选择 <strong>Senders</strong>，添加你想要显示的邮件发件人名称和邮件地址。</p>
+<p>注意：发信邮件地址的域名，必须是你已经在 <strong>Domains</strong> 里面添加好并且解析生效的域名。</p>
+<p>然后选择 <strong>SMTP &amp; API</strong> 模块，再进入 <strong>API keys &amp; MCP</strong>，生成一个 API，并妥善保存。</p>
+<p>接着我们打开 WordPress 博客的管理页面，安装并启用 <strong>Brevo</strong> 插件。</p>
+<p><img src="https://tc.guoshengsheng.eu.org/file/1776171764304_b1.png" alt="“Brevo”插件" /></p>
+<p>然后点击左侧的 <strong>Brevo</strong> 板块，将刚刚生成的 API 粘贴到对应的位置。</p>
+<p><img src="https://tc.guoshengsheng.eu.org/file/1776171853680_b2.png" alt="b2.png" /></p>
+<p>接着，我们打开“事务性电子邮件”按钮，这样就算成功配置好了。</p>
+<p><img src="https://tc.guoshengsheng.eu.org/file/1776172198501_b3.png" alt="b3.png" /></p>
+<p>完成这些设置后，我们就可以开放注册功能了，用户也可以通过电子邮件来完成注册验证。这样一来，不仅博客的注册流程会更规范，在博客收到评论、有新用户注册时，你也能及时收到邮件通知。</p>
+]]></description>
+      <category>邮件</category>
+      <category>发信</category>
+      <category>邮箱</category>
+      <category>博客</category>
+      <category>Wordpress</category>
+    </item>
     <item>
       <title>网站优化小记：引入流量统计与数据分析</title>
       <link>https://ywun365.github.io/post/analytics/</link>
