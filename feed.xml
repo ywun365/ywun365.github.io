@@ -6,8 +6,42 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Mon, 13 Apr 2026 20:49:55 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 14 Apr 2026 11:04:53 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>网站优化小记：引入流量统计与数据分析</title>
+      <link>https://ywun365.github.io/post/analytics/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/analytics/</guid>
+      <pubDate>Tue, 14 Apr 2026 11:04:53 +0800</pubDate>
+      <description><![CDATA[<p>今天上午对网站进行了一些细节上的优化，主要集中在访问量统计和多维度数据监控两个方面。</p>
+<h2 id="-">一、 前端实时统计：集成“不蒜子”</h2>
+<p>我在网页底部添加了直观的访问数据展示，包括“本站总访问量”与“本站总访客数”。</p>
+<ol>
+<li>代码实现</li>
+</ol>
+<p>引入了轻量级的统计脚本：</p>
+<pre><code class="language-html">&lt;script async src=&quot;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&quot;&gt;&lt;/script&gt;
+
+&lt;span id=&quot;busuanzi_container_site_pv&quot; style=&quot;display:none&quot;&gt;
+  本站总访问量 &lt;span id=&quot;busuanzi_value_site_pv&quot;&gt;&lt;/span&gt; 次
+&lt;/span&gt;
+&lt;span id=&quot;busuanzi_container_site_uv&quot; style=&quot;display:none&quot;&gt;
+  本站总访客数 &lt;span id=&quot;busuanzi_value_site_uv&quot;&gt;&lt;/span&gt; 人
+&lt;/span&gt;
+</code></pre>
+<ol start="2">
+<li>实现原理分析</li>
+</ol>
+<p>关于这段代码的工作逻辑，简单来说是：</p>
+<p>每当有人点进网站，脚本就会给服务器发个“信号”。<br />
+服务器很聪明，它能分清是“同一个人的多次刷新”（PV）还是“不同人的到访”（UV），然后精准记账。</p>
+<h2 id="--1">二、 后台深度监控：接入主流统计平台</h2>
+<p>为了更全面地掌握网站的运行状况，我将网站正式接入了 Google Analytics和 百度统计。</p>
+<h2 id="heading">总结</h2>
+<p>这次优化虽然改动不大，但通过展示与分析的结合，让博客的数据变得更加“数字化”。看着访问量一点点增长，也是一种独特的成就感。</p>
+]]></description>
+      <category>博客</category>
+    </item>
     <item>
       <title> SBTI 刷屏背后的“奇迹”：我申请的免费域名竟然在微信里解封了？</title>
       <link>https://ywun365.github.io/post/freedomain/</link>
