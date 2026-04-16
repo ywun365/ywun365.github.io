@@ -6,8 +6,27 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Tue, 14 Apr 2026 20:38:56 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 16 Apr 2026 19:48:38 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>便签墙</title>
+      <link>https://ywun365.github.io/post/wishwall/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/wishwall/</guid>
+      <pubDate>Thu, 16 Apr 2026 19:48:38 +0800</pubDate>
+      <description><![CDATA[<p>今天在网上浏览网站的时候，看到一个“标签墙”网站让我眼前一亮。<br />
+界面简洁美观，可以用鼠标拖拽便签，交互感拉满。<br />
+<a href="https://www.aobp.cn/wishes">标签墙 - Serenity&rsquo;s Blog</a></p>
+<p>于是便动手制作。<br />
+这是最终成品：<br />
+<a href="https://wish.xiaoeu.de5.net/">便签墙</a></p>
+<p>便签墙代码已放在Github上，欢迎访问。<br />
+<a href="https://github.com/xiaoyanblog/wish-wall">https://github.com/xiaoyanblog/wish-wall</a></p>
+<p>也欢迎部署一个属于自己的便签墙哦~</p>
+]]></description>
+      <category>便签墙</category>
+      <category>代码</category>
+      <category>项目</category>
+    </item>
     <item>
       <title>将Wordpress接入邮件发信平台</title>
       <link>https://ywun365.github.io/post/connect-wordpress-to-email-platforms/</link>
