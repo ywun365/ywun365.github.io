@@ -6,8 +6,37 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Fri, 17 Apr 2026 16:34:09 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 21:11:17 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>便签墙 2.0 安全专项更新公告</title>
+      <link>https://ywun365.github.io/post/wish2update/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/wish2update/</guid>
+      <pubDate>Fri, 17 Apr 2026 21:11:17 +0800</pubDate>
+      <description><![CDATA[<p>本次 2.0 版本聚焦于系统安全性与底层架构优化，通过引入多项安全管理功能，进一步保障平台的稳定运行。</p>
+<h2 id="heading">新增功能</h2>
+<ul>
+<li><strong>访问审计：</strong> 新增 IP 记录开关。开启后，系统将自动记录留言发布者的 IP 地址，提升管理透明度与溯源能力。</li>
+<li><strong>频率限制：</strong> 新增单 IP 每日留言上限设置，有效防止恶意刷屏及自动化脚本的灌水行为。</li>
+<li><strong>人机校验：</strong> 新增验证码安全开关。启用后，用户在留言前需完成人机验证，保障交互安全性。</li>
+</ul>
+<h2 id="heading-1">重要说明：破坏性更新预警</h2>
+<p><strong>请在升级前务必阅读以下内容：</strong></p>
+<p>本次更新对<strong>数据库底层代码进行了重构</strong>。若您选择从旧版本升级至 v2.0，或在旧版环境中部署 2.0，需要执行全新的数据库初始化脚本。</p>
+<ul>
+<li><strong>影响范围：</strong> 执行更新操作将<strong>清空现有数据库中的所有历史数据</strong>。</li>
+<li><strong>重构原因：</strong> 在开发过程中我们发现，为了兼容旧版逻辑而保留的向下兼容代码导致了数据库加载冗余，严重影响了代码执行效率。为了追求更卓越的性能体验，我们决定舍弃旧有架构，采用全新的高效数据库方案。</li>
+</ul>
+<h2 id="heading-2">版本回退</h2>
+<p>如果您目前没有安全管理需求，或希望保留现有数据而不进行重新部署，请回滚并继续使用旧版本（旧版不包含上述安全管理功能）。</p>
+<ul>
+<li><strong>旧版本下载/查阅：</strong> <a href="https://github.com/xiaoyanblog/wishwall2.0/tree/c47b3c414fdcffbab10fcb08bb0e267bdd83ec36">点击此处访问老版本</a></li>
+</ul>
+]]></description>
+      <category>项目</category>
+      <category>代码</category>
+      <category>便签墙</category>
+    </item>
     <item>
       <title>便签墙2.0版本上线</title>
       <link>https://ywun365.github.io/post/wish2/</link>
