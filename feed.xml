@@ -6,8 +6,24 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Thu, 16 Apr 2026 19:48:38 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 16:34:09 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>便签墙2.0版本上线</title>
+      <link>https://ywun365.github.io/post/wish2/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/wish2/</guid>
+      <pubDate>Fri, 17 Apr 2026 16:27:44 +0800</pubDate>
+      <description><![CDATA[<p>更新日志：<br />
+便签墙2.0版本新增了后台管理页面，点击右上角钥匙图标即可进入管理页面。<br />
+管理页面能便捷的管理留言的内容，无需进入数据库，在可视化的页面即可删除、屏蔽、修改留言内容。<br />
+修复了一些已知的bug。</p>
+<p>地址：https://github.com/xiaoyanblog/wishwall2.0<br />
+演示站点：https://wish2.xiaoeu.de5.net</p>
+]]></description>
+      <category>代码</category>
+      <category>项目</category>
+      <category>便签墙</category>
+    </item>
     <item>
       <title>便签墙</title>
       <link>https://ywun365.github.io/post/wishwall/</link>
