@@ -6,7 +6,7 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Sun, 19 Apr 2026 20:00:48 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 19 Apr 2026 20:20:51 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
       <title>便签墙 3.0  专项更新</title>
@@ -15,14 +15,16 @@
       <pubDate>Sun, 19 Apr 2026 20:00:48 +0800</pubDate>
       <description><![CDATA[<p>3.0 更新说明</p>
 <p>前台图片加载优化：页面打开后优先显示文字内容，图片延后分批加载，并带转圈加载动画，避免大量图片拖慢首屏。</p>
-<p>后台移动端优化：手机访问后台时，留言管理、安全管理、通知管理改为底部固定导航，打开页面先看到内容，不再被大块菜单挤占首屏。</p>
+<p>移动端优化：手机发表留言时，留言栏会突出显示而不被便签挡住，优化了移动端用户体验。<br />
+手机访问后台时，留言管理、安全管理、通知管理改为底部固定导航，打开页面先看到内容，不再被大块菜单挤占首屏。</p>
 <p>管理员登录验证码：安全设置中新增“管理员登录开启验证码”，可按需要求后台登录先完成 hCaptcha。</p>
 <p>通知管理：后台新增通知管理页面，支持新留言邮件通知、测试邮件、通知收件箱/发送日志。<br />
 发信方式：支持传统 SMTP，也支持 Brevo API 发信。</p>
 <p>数据库重置：数据库新增两个表格，并保留留言、安全设置、提交日志表。</p>
 <p>新增上传图片功能：游客可以通过图床链接上传图片。</p>
-<p>总结：3.0版本着重在交互方面进行优化，另外增加了新留言邮件通知功能。<br />
+<p>省流：3.0版本着重在交互方面进行优化，另外增加了新留言邮件通知功能。<br />
 在安全性方面新增了“管理员登录开启验证码”，开启后能大大降低被猜到管理员密码的概率。</p>
+<p>项目地址:https://github.com/xiaoyanblog/wishwall3.0</p>
 ]]></description>
       <category>项目</category>
       <category>代码</category>
