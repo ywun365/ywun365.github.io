@@ -6,8 +6,237 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Sun, 19 Apr 2026 20:20:51 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 28 May 2026 20:02:44 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>1Panel + MCSManager 搭建 Minecraft 服务器无法联机的排障记录</title>
+      <link>https://ywun365.github.io/post/minecrafe/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/minecrafe/</guid>
+      <pubDate>Thu, 28 May 2026 20:02:44 +0800</pubDate>
+      <description><![CDATA[<p>最近我用 <strong>1Panel + MCSManager + Docker</strong> 搭建了一个 Minecraft Paper 服务器。服务端本身能够正常启动，但是客户端一直无法正常联机。整个问题排查下来，发现并不是 Minecraft 服务端没有启动，而是 Docker 端口映射、MCSManager 容器化配置以及离线版登录验证几个问题叠加导致的。</p>
+<p>这篇文章记录一下完整排查过程，方便以后自己复盘，也希望能帮到遇到类似问题的人。</p>
+<hr />
+<h2 id="heading">一、问题现象</h2>
+<p>服务器环境大致如下：</p>
+<pre><code class="language-text">系统：Debian
+面板：1Panel
+管理器：MCSManager
+服务端：Paper 1.21.11
+Java：21
+默认端口：25565
+部署方式：Docker
+</code></pre>
+<p>最开始在 MCSManager 里启动 Minecraft 实例时，日志显示服务端已经启动成功：</p>
+<pre><code class="language-text">Starting Minecraft server on *:25565
+Done (...)! For help, type &quot;help&quot;
+</code></pre>
+<p>这说明 Paper 服务端本身没有崩溃，监听端口也是正常的 <code>25565</code>。</p>
+<p>但是客户端连接服务器时一直失败。最开始我以为是 1Panel 防火墙、云服务器安全组或者服务器端口没有放行。后来逐项检查后发现：</p>
+<pre><code class="language-text">1Panel 防火墙：已放行 TCP 25565
+云服务器安全组：已放行 TCP 25565
+Paper 服务端：已监听 25565
+</code></pre>
+<p>按理说已经满足外网联机条件，但还是连接不上。</p>
+<hr />
+<h2 id="docker-">二、第一次排查：Docker 容器端口没有映射</h2>
+<p>后来通过 SSH 执行：</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>发现 <code>mcsmanager-daemon</code> 容器只映射了管理端口：</p>
+<pre><code class="language-text">0.0.0.0:40057-&gt;24444/tcp
+</code></pre>
+<p>但是没有看到 Minecraft 需要的：</p>
+<pre><code class="language-text">0.0.0.0:25565-&gt;25565/tcp
+</code></pre>
+<p>这就说明问题很可能出在 Docker 端口映射上。</p>
+<p>虽然 Minecraft 服务端在容器内部监听了 <code>25565</code>，但是宿主机没有把这个端口暴露出来，外网自然访问不到。</p>
+<p>一开始我尝试去修改：</p>
+<pre><code class="language-text">/opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon/docker-compose.yml
+</code></pre>
+<p>在 <code>ports</code> 下添加：</p>
+<pre><code class="language-yaml">- &quot;25565:25565/tcp&quot;
+</code></pre>
+<p>但实际效果并不理想，<code>docker ps</code> 里仍然没有出现 <code>25565-&gt;25565/tcp</code>。后来发现，1Panel 应用商店安装的应用，直接手动改 compose 文件并不是最推荐的方式，后续重建、更新或者面板管理时也可能不稳定。</p>
+<p>于是换了一个更合适的办法：<strong>让 Minecraft 实例本身容器化运行，并由实例容器开放 25565。</strong></p>
+<hr />
+<h2 id="-mcsmanager-">三、正确方向：开启 MCSManager 实例容器化</h2>
+<p>进入 MCSManager 后，打开 Minecraft 实例的：</p>
+<pre><code class="language-text">应用实例设置 → 容器化
+</code></pre>
+<p>然后开启：</p>
+<pre><code class="language-text">启用 Docker 容器
+</code></pre>
+<p>我这里服务端是 Paper 1.21.11，需要 Java 21，所以 Docker 镜像填写：</p>
+<pre><code class="language-text">eclipse-temurin:21-jre
+</code></pre>
+<p>容器内工作目录填写：</p>
+<pre><code class="language-text">/workspace
+</code></pre>
+<p>并且打开“更改容器默认工作目录”。</p>
+<p>端口映射这里是最关键的，添加：</p>
+<pre><code class="language-text">外部访问端口：25565
+容器内端口：25565
+协议：TCP
+</code></pre>
+<p>也就是等价于：</p>
+<pre><code class="language-text">25565:25565/tcp
+</code></pre>
+<p>网络模式保持：</p>
+<pre><code class="language-text">bridge
+</code></pre>
+<p>容器名可以自定义，例如：</p>
+<pre><code class="language-text">mc-paper
+</code></pre>
+<p>这样做的思路是：<br />
+不再强行让 <code>mcsmanager-daemon</code> 占用 Minecraft 的游戏端口，而是让 Minecraft 实例自己的容器开放 <code>25565</code>。</p>
+<hr />
+<h2 id="mount-path-must-be-absolute">四、遇到的新错误：mount path must be absolute</h2>
+<p>开启实例容器化后，第一次启动又出现了新的错误：</p>
+<pre><code class="language-text">invalid mount config for type &quot;bind&quot;:
+invalid mount path: 'data/daemon/data/InstanceData/...' mount path must be absolute
+</code></pre>
+<p>这个错误的意思是：MCSManager 在创建实例容器时，要把实例目录挂载进 Docker 容器，但是它传给 Docker 的宿主机路径是相对路径。</p>
+<p>错误路径类似：</p>
+<pre><code class="language-text">data/daemon/data/InstanceData/...
+</code></pre>
+<p>而 Docker 要求宿主机挂载路径必须是绝对路径，比如：</p>
+<pre><code class="language-text">/opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon/data/daemon/data/InstanceData
+</code></pre>
+<p>解决方法是修改 <code>mcsmanager-daemon</code> 的 compose 配置。</p>
+<p>打开：</p>
+<pre><code class="language-text">/opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon/docker-compose.yml
+</code></pre>
+<p>找到环境变量：</p>
+<pre><code class="language-yaml">MCSM_DOCKER_WORKSPACE_PATH
+</code></pre>
+<p>把它改成绝对路径：</p>
+<pre><code class="language-yaml">- MCSM_DOCKER_WORKSPACE_PATH=/opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon/data/daemon/data/InstanceData
+</code></pre>
+<p>同时注意：如果之前在 daemon 的 <code>ports</code> 里手动添加过 <code>25565:25565/tcp</code>，这时要删掉，避免 daemon 先占用 25565，导致 Minecraft 实例容器无法使用这个端口。</p>
+<p>也就是说 daemon 的端口只保留管理端口即可：</p>
+<pre><code class="language-yaml">ports:
+  - ${HOST_IP}:${PANEL_APP_PORT_HTTP}:24444
+</code></pre>
+<p>然后在 SSH 中执行：</p>
+<pre><code class="language-bash">cd /opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon
+docker compose down
+docker compose up -d
+</code></pre>
+<p>重建完成后，再回到 MCSManager 启动 Minecraft 实例。</p>
+<hr />
+<h2 id="heading-1">五、服务端成功启动</h2>
+<p>重新启动后，日志终于正常了：</p>
+<pre><code class="language-text">已挂载工作目录：/opt/1panel/apps/mcsmanager-daemon/... --&gt; /workspace
+已为实例开放以下端口：
+外部访问端口：25565 -&gt; 容器内端口：25565 / 协议：tcp
+Starting Minecraft server on *:25565
+Done (...)! For help, type &quot;help&quot;
+</code></pre>
+<p>这说明几个关键点都成功了：</p>
+<pre><code class="language-text">1. Minecraft 实例容器创建成功
+2. 服务端目录挂载成功
+3. 25565 端口映射成功
+4. Paper 服务端正常启动
+</code></pre>
+<p>到这里，服务器已经不是“外网连不到”的状态了，而是客户端确实能够访问到服务端。</p>
+<hr />
+<h2 id="connection-throttled">六、客户端报错：Connection throttled</h2>
+<p>第一次客户端连接时，出现了：</p>
+<pre><code class="language-text">Connection throttled! Please wait before reconnecting.
+</code></pre>
+<p>这个不是版本问题，而是连接太频繁，被 Bukkit/Paper 的连接节流限制拦了一下。</p>
+<p>可以先等十几秒再重新连接。如果一直出现，可以修改：</p>
+<pre><code class="language-text">bukkit.yml
+</code></pre>
+<p>找到：</p>
+<pre><code class="language-yaml">connection-throttle: 4000
+</code></pre>
+<p>改成：</p>
+<pre><code class="language-yaml">connection-throttle: -1
+</code></pre>
+<p>保存后重启服务器。</p>
+<hr />
+<h2 id="heading-2">七、离线版客户端报错：无效会话</h2>
+<p>后来客户端又出现：</p>
+<pre><code class="language-text">登录失败：无效会话（请尝试重启游戏及启动器）
+</code></pre>
+<p>这个就和离线版启动器有关了。</p>
+<p>Minecraft 服务端默认开启正版验证：</p>
+<pre><code class="language-properties">online-mode=true
+</code></pre>
+<p>如果客户端是离线版、非正版启动器，就可能无法通过 Mojang 正版会话验证。</p>
+<p>解决方法是编辑：</p>
+<pre><code class="language-text">server.properties
+</code></pre>
+<p>把：</p>
+<pre><code class="language-properties">online-mode=true
+</code></pre>
+<p>改成：</p>
+<pre><code class="language-properties">online-mode=false
+</code></pre>
+<p>保存后重启服务器。</p>
+<p>需要注意的是，关闭正版验证后，服务器安全性会降低，因为玩家可以使用任意名字进入服务器。建议同时开启白名单：</p>
+<pre><code class="language-text">whitelist on
+whitelist add 玩家名
+</code></pre>
+<p>这样可以减少陌生人乱进服务器的风险。</p>
+<hr />
+<h2 id="heading-3">八、最终总结</h2>
+<p>这次问题不是单一原因，而是几个点叠加造成的：</p>
+<pre><code class="language-text">1. Paper 服务端本身其实已经正常启动
+2. 1Panel 防火墙和云服务器安全组都没问题
+3. 真正卡住的是 Docker 端口映射
+4. 不建议直接让 mcsmanager-daemon 占用 25565
+5. 更合适的方式是开启 MCSManager 实例容器化
+6. 容器化时要设置 25565:25565/tcp
+7. MCSM_DOCKER_WORKSPACE_PATH 必须使用绝对路径
+8. 离线版客户端需要关闭 online-mode
+9. Connection throttled 是连接过快导致的限流
+</code></pre>
+<p>最终可用配置大致如下。</p>
+<h3 id="mcsmanager-">MCSManager 实例容器化配置</h3>
+<pre><code class="language-text">启用 Docker 容器：开启
+Docker 镜像：eclipse-temurin:21-jre
+容器内工作目录：/workspace
+开放端口：25565 -&gt; 25565 / TCP
+网络模式：bridge
+容器名：mc-paper
+</code></pre>
+<h3 id="mcsmanager-daemon-">mcsmanager-daemon 配置重点</h3>
+<pre><code class="language-yaml">environment:
+  - MCSM_DOCKER_WORKSPACE_PATH=/opt/1panel/apps/mcsmanager-daemon/mcsmanager-daemon/data/daemon/data/InstanceData
+</code></pre>
+<h3 id="serverproperties">server.properties</h3>
+<pre><code class="language-properties">online-mode=false
+</code></pre>
+<h3 id="bukkityml">bukkit.yml</h3>
+<pre><code class="language-yaml">connection-throttle: -1
+</code></pre>
+<hr />
+<h2 id="heading-4">九、排障经验</h2>
+<p>这次最大的经验是：<br />
+看到 Minecraft 服务端日志里出现 <code>Done</code>，并不代表外网一定能连上。对于 Docker 部署的服务来说，还要检查宿主机端口是否真的映射出来。</p>
+<p>排查顺序建议是：</p>
+<pre><code class="language-text">1. 看服务端是否 Done
+2. 看服务端是否监听 25565
+3. 看 docker ps 是否有 25565-&gt;25565/tcp
+4. 看 1Panel 防火墙是否放行
+5. 看云服务器安全组是否放行
+6. 看客户端版本是否一致
+7. 看是否需要关闭 online-mode
+</code></pre>
+<p>如果 <code>docker ps</code> 里没有看到：</p>
+<pre><code class="language-text">0.0.0.0:25565-&gt;25565/tcp
+</code></pre>
+<p>那基本就可以判断：服务端可能在容器里跑着，但外网还没有真正访问到它。</p>
+<p>这次折腾下来，最终解决方案就是：<br />
+<strong>使用 MCSManager 的实例容器化功能，让 Minecraft 实例自己的 Docker 容器开放 25565，而不是把游戏端口硬塞给 mcsmanager-daemon。</strong></p>
+]]></description>
+      <category>Minecraft</category>
+      <category>我的世界</category>
+      <category>服务器</category>
+      <category>1panel</category>
+    </item>
     <item>
       <title>便签墙 3.0  专项更新</title>
       <link>https://ywun365.github.io/post/wish3/</link>
@@ -263,69 +492,6 @@
       <category>Gridea</category>
       <category>入门</category>
       <category>博客</category>
-    </item>
-    <item>
-      <title>关于</title>
-      <link>https://ywun365.github.io/post/about/</link>
-      <guid isPermaLink="true">https://ywun365.github.io/post/about/</guid>
-      <pubDate>Sun, 12 Apr 2026 10:16:30 +0800</pubDate>
-      <description><![CDATA[<!-- 这是一个关于页面的模板，你可以根据自己的风格随意修改。开始写你自己的故事吧。 -->
-<!--
-### 关于我
-
-嗨，我是 __ __ ，一个 __ __ 的人。
-
-坐标深圳，做产品经理第五年。白天画原型，晚上写点乱七八糟的东西。 -->
-<!-- 用你自己的方式介绍自己。可以是一句话，也可以是一段故事。
-比如：
-
-「一个写了八年代码的后端工程师，最近开始对设计产生了兴趣。」
-
-「坐标深圳，做产品经理第五年。白天画原型，晚上写点乱七八糟的东西。」
-
-「自由职业者，养了两只猫，正在学习用文字把日子过得更清楚一些。」
-
-不需要很正式，用你平时说话的语气就好。 --> 
-<h3 id="heading">关于我的博客</h3>
-<p>我发现自己想的很多事情，不写下来就会忘。写博客不是为了给别人看，是怕将来的自己想不起来现在的自己在想什么。</p>
-<!-- 这部分往往是关于页面里最打动人的部分。也可以换成你自己的版本，比如：
-
-「工作中踩过太多坑了，每次都想着"下次一定记下来"，然后下次又忘了。这个博客就是那个"下次"。」
-
-「没什么特别的原因，就是想在互联网上有一个属于自己的小角落。」 -->
-<h3 id="heading-1">你能在这里看到什么</h3>
-<ul>
-<li>技术笔记和踩坑记录</li>
-<li>偶尔写点产品思考和读书笔记</li>
-<li>一些不知道该归到哪一类的碎碎念</li>
-</ul>
-<!-- 改成你自己打算写的方向就好 -->
-<h3 id="heading-2">博客网址</h3>
-<!-- 改成你自己打算写的方向就好 -->
-<h4 id="heading-3">长期链接</h4>
-<p>长期链接简单舒心，无需担心后续维护和续费问题。<br />
-Github页入口：<a href="https://ywun365.github.io/">点这里进入</a><br />
-Worker页入口：<a href="https://ywun365blog.tdun365.workers.dev/">点这里进入</a></p>
-<h4 id="heading-4">优化链接</h4>
-<p>优化链接会对国内访问进行持续优化，以便能在任何地方轻松打开博客，甚至是微信内的浏览器。<br />
-以下各线路分别部署在不同的平台，在每个地方的打开速度各有差异。<br />
-线路一：<br />
-<a href="https://www.xzweb.ccwu.cc">www.xzweb.ccwu.cc</a><br />
-<a href="https://marike.cc.cd/">marike.cc.cd</a><br />
-线路二：<br />
-<a href="https://blog.xiaoeu.de5.net/">blog.xiaoeu.de5.net</a><br />
-<a href="https://ywun365.vercel.app/">ywun365.vercel.app</a></p>
-<h3 id="heading-5">找到我</h3>
-<ul>
-<li>Email:zywtosend@outlook.com</li>
-<li>Email:tdun365@gmail.com<br />
-本网站未开通评论功能。<br />
-如想与站长取得沟通联系，欢迎来信！</li>
-</ul>
-<!-- 换成你自己的链接，也可以加上 Twitter、掘金、知乎、微信公众号等 -->
-<hr />
-<p>本站使用 <a href="https://www.gridea.pro/">Gridea Pro</a> 搭建。</p>
-]]></description>
     </item>
   </channel>
 </rss>
