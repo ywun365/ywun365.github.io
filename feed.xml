@@ -6,7 +6,7 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Sun, 31 May 2026 10:23:10 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 31 May 2026 10:39:13 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <item>
       <title>主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？</title>
@@ -323,15 +323,13 @@ from MacBook-Pro
 <p>建议：</p>
 <ul>
 <li>不要用它们发送隐私敏感内容；</li>
-<li>如果一定要发，先使用可信的网络代理或 VPN；</li>
+<li>如果一定要发，先使用可信的网络代理；</li>
 <li>发完后用“查看邮件原文”的方法复查邮件头；</li>
 <li>不要在电脑名、邮箱昵称、签名里写过多个人信息。</li>
 </ul>
-<p>需要注意：VPN 只能让邮件头显示 VPN 出口 IP，不代表邮件内容本身更安全。邮件内容是否安全，还取决于邮件服务商、传输加密和收件方安全性。</p>
 <hr />
 <h3 id="3--1">3. 如果你只是普通日常发邮件</h3>
 <p>普通学习、工作、注册账号、收验证码等场景，一般不用太紧张。</p>
-<p>但如果你要发送涉及身份、位置、举报、维权、敏感工作材料等内容，就应该优先考虑隐藏 IP 的邮箱和发送方式。</p>
 <hr />
 <h2 id="heading-4">九、快速自查清单</h2>
 <p>发送隐私敏感邮件前，可以按下面清单检查：</p>
