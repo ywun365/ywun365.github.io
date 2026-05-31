@@ -34,7 +34,7 @@
 
 <meta name="description" content="一、先说结论 如果你只想快速选择邮箱，可以直接看下面这张表。 推荐程度 邮件服务 适合怎么用 隐私表现 强烈推荐 iCloud Mail 国际版 / 国内版 官方客户端、网页端、第三方 SMTP 都可以 基本隐藏真实公网 IP 和内网 IP 可以用，但要注意 Outlook.com 只建议用 Outlook 官方客户端">
 <link rel="canonical" href="https://ywun365.github.io/post/email/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？","url":"https://ywun365.github.io/post/email/","description":"一、先说结论 如果你只想快速选择邮箱，可以直接看下面这张表。 推荐程度 邮件服务 适合怎么用 隐私表现 强烈推荐 iCloud Mail 国际版 / 国内版 官方客户端、网页端、第三方 SMTP 都可以 基本隐藏真实公网 IP 和内网 IP 可以用，但要注意 Outlook.com 只建议用 Outlook 官方客户端","datePublished":"2026-05-31T10:23:10+08:00","dateModified":"2026-05-31T10:39:13+08:00","author":{"@type":"Person","name":"海底の奇妙观测站"},"publisher":{"@type":"Organization","name":"海底の奇妙观测站"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？","url":"https://ywun365.github.io/post/email/","description":"一、先说结论 如果你只想快速选择邮箱，可以直接看下面这张表。 推荐程度 邮件服务 适合怎么用 隐私表现 强烈推荐 iCloud Mail 国际版 / 国内版 官方客户端、网页端、第三方 SMTP 都可以 基本隐藏真实公网 IP 和内网 IP 可以用，但要注意 Outlook.com 只建议用 Outlook 官方客户端","datePublished":"2026-05-31T10:23:10+08:00","dateModified":"2026-05-31T17:31:30+08:00","author":{"@type":"Person","name":"海底の奇妙观测站"},"publisher":{"@type":"Organization","name":"海底の奇妙观测站"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://ywun365.github.io","name":"海底の奇妙观测站","position":1},{"@type":"ListItem","item":"https://ywun365.github.io/post/email/","name":"主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？","position":2}]}</script>
 <meta property="og:title" content="主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？">
 <meta property="og:description" content="一、先说结论 如果你只想快速选择邮箱，可以直接看下面这张表。 推荐程度 邮件服务 适合怎么用 隐私表现 强烈推荐 iCloud Mail 国际版 / 国内版 官方客户端、网页端、第三方 SMTP 都可以 基本隐藏真实公网 IP 和内网 IP 可以用，但要注意 Outlook.com 只建议用 Outlook 官方客户端">
@@ -186,7 +186,7 @@ var _hmt = _hmt || [];
 <td>可以用，但要注意</td>
 <td>Outlook.com</td>
 <td>只建议用 Outlook 官方客户端</td>
-<td>官方客户端隐藏 IP，第三方 SMTP 会泄露 IP</td>
+<td>官方客户端隐藏 IP，第三方 SMTP 未测试</td>
 </tr>
 <tr>
 <td>不建议发隐私敏感邮件</td>
@@ -307,15 +307,15 @@ var _hmt = _hmt || [];
 <tr>
 <td>Outlook.com</td>
 <td>隐藏真实 IP</td>
-<td>会泄露真实 IP</td>
-<td>可能泄露内网 IP</td>
+<td>网络原因，未测试</td>
+<td>可能显示计算机名</td>
 <td>只建议用官方客户端</td>
 </tr>
 <tr>
 <td>飞书 Lark 国际版</td>
 <td>会泄露真实 IP</td>
 <td>会泄露真实 IP</td>
-<td>可能泄露内网 IP</td>
+<td>泄露内网 IP</td>
 <td>不适合隐私敏感邮件</td>
 </tr>
 <tr>
@@ -360,13 +360,13 @@ var _hmt = _hmt || [];
 <tr>
 <td>Foxmail、Thunderbird 等第三方 SMTP</td>
 <td>不推荐</td>
-<td>可能泄露真实公网 IP 和内网 IP</td>
+<td>未测试，可能泄露真实公网 IP 和内网 IP</td>
 </tr>
 </tbody>
 </table>
 <p>原因很简单：</p>
 <p>Outlook 官方客户端使用的是微软自己的邮件提交方式，服务器会帮你重写邮件头，所以收件人看不到你的真实 IP。</p>
-<p>但如果你用第三方 SMTP 客户端，邮件服务会按标准 SMTP 流程记录连接来源，这时你的真实 IP 就可能被写进邮件头。</p>
+<p>但如果你用第三方 SMTP 客户端，邮件服务可能会按标准 SMTP 流程记录连接来源，这时你的真实 IP 就有可能被写进邮件头。</p>
 <hr />
 <h3 id="3--lark">3. 飞书 Lark：更偏向企业审计，不偏向个人隐私</h3>
 <p>飞书属于企业协作平台，邮件系统更重视“可追溯”。</p>
@@ -413,7 +413,7 @@ var _hmt = _hmt || [];
 <tr>
 <td>大陆访问速度</td>
 <td>相对较慢</td>
-<td>更快、更稳定</td>
+<td>更快</td>
 </tr>
 <tr>
 <td>推荐 SMTP 服务器</td>
@@ -422,8 +422,8 @@ var _hmt = _hmt || [];
 </tr>
 </tbody>
 </table>
-<p>对中国大陆用户来说，国内版 iCloud 的 SMTP 服务器通常更适合：</p>
-<pre><code class="language-text">SMTP 服务器：smtp.icloud.com.cn
+<p>对中国大陆用户来说，虽然使用国内版 iCloud 的 SMTP 服务器会更快，但仍建议选择国际版SMTP服务器：</p>
+<pre><code class="language-text">SMTP 服务器：smtp.mail.me.com
 端口：587
 加密方式：STARTTLS
 登录方式：使用 Apple ID 的应用专用密码
@@ -460,8 +460,8 @@ from MacBook-Pro
 <h3 id="1--1">1. 如果你最在意隐私</h3>
 <p>优先选择：</p>
 <ol>
-<li>iCloud Mail；</li>
-<li>Outlook 官方客户端或 Outlook 网页端。</li>
+<li>iCloud Mail、Gmail；</li>
+<li>Outlook 官方客户端或网页端。</li>
 </ol>
 <p>不要优先选择：</p>
 <ul>
@@ -470,16 +470,7 @@ from MacBook-Pro
 <li>其他会在邮件头中保留发件 IP 的邮箱。</li>
 </ul>
 <hr />
-<h3 id="2--qq-">2. 如果你必须使用 QQ 邮箱或飞书</h3>
-<p>建议：</p>
-<ul>
-<li>不要用它们发送隐私敏感内容；</li>
-<li>如果一定要发，先使用可信的网络代理；</li>
-<li>发完后用“查看邮件原文”的方法复查邮件头；</li>
-<li>不要在电脑名、邮箱昵称、签名里写过多个人信息。</li>
-</ul>
-<hr />
-<h3 id="3--1">3. 如果你只是普通日常发邮件</h3>
+<h3 id="2--1">2. 如果你只是普通日常发邮件</h3>
 <p>普通学习、工作、注册账号、收验证码等场景，一般不用太紧张。</p>
 <hr />
 <h2 id="heading-4">九、快速自查清单</h2>
