@@ -6,8 +6,392 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Thu, 28 May 2026 20:02:44 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 31 May 2026 10:23:10 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？</title>
+      <link>https://ywun365.github.io/post/email/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/email/</guid>
+      <pubDate>Sun, 31 May 2026 10:23:10 +0800</pubDate>
+      <description><![CDATA[<h2 id="heading">一、先说结论</h2>
+<p>如果你只想快速选择邮箱，可以直接看下面这张表。</p>
+<table>
+<thead>
+<tr>
+<th>推荐程度</th>
+<th>邮件服务</th>
+<th>适合怎么用</th>
+<th>隐私表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>强烈推荐</td>
+<td>iCloud Mail 国际版 / 国内版</td>
+<td>官方客户端、网页端、第三方 SMTP 都可以</td>
+<td>基本隐藏真实公网 IP 和内网 IP</td>
+</tr>
+<tr>
+<td>可以用，但要注意</td>
+<td>Outlook.com</td>
+<td>只建议用 Outlook 官方客户端</td>
+<td>官方客户端隐藏 IP，第三方 SMTP 会泄露 IP</td>
+</tr>
+<tr>
+<td>不建议发隐私敏感邮件</td>
+<td>飞书 Lark 国际版</td>
+<td>企业办公邮件</td>
+<td>官方客户端和第三方客户端都会泄露 IP</td>
+</tr>
+<tr>
+<td>不建议发隐私敏感邮件</td>
+<td>QQ 邮箱</td>
+<td>日常普通邮件</td>
+<td>官方客户端和第三方客户端都会泄露 IP</td>
+</tr>
+</tbody>
+</table>
+<p>简单理解：</p>
+<ul>
+<li><strong>最稳妥：iCloud Mail。</strong></li>
+<li><strong>Outlook 也可以，但最好只用官方客户端。</strong></li>
+<li><strong>QQ 邮箱、飞书这类服务更偏向可追溯，不适合发送特别注重隐私的邮件。</strong></li>
+</ul>
+<hr />
+<h2 id="-ip">二、为什么邮件会泄露 IP？</h2>
+<p>邮件发送出去以后，会带着一段叫做<strong>邮件头</strong>的信息。</p>
+<p>邮件头就像快递单上的物流记录，里面可能会记录：</p>
+<ul>
+<li>邮件从哪里发出；</li>
+<li>经过了哪些服务器；</li>
+<li>发件设备连接服务器时使用的公网 IP；</li>
+<li>有些情况下还会包含内网 IP、电脑名称等信息。</li>
+</ul>
+<p>如果邮箱服务商没有帮你隐藏这些信息，收件人查看邮件原文时，就可能看到你的真实 IP。</p>
+<hr />
+<h2 id="-ip-1">三、实测方法：怎么判断邮箱有没有泄露 IP？</h2>
+<p>你可以按下面的方法自己复测。</p>
+<h3 id="1-">1. 发送测试邮件</h3>
+<p>用你要测试的邮箱，分别通过这些方式发一封邮件给自己的另一个邮箱：</p>
+<ul>
+<li>网页端发送；</li>
+<li>手机或电脑官方客户端发送；</li>
+<li>第三方客户端发送，比如 Foxmail、Thunderbird。</li>
+</ul>
+<h3 id="2-">2. 查看邮件原文或完整邮件头</h3>
+<p>以 QQ 邮箱收件为例，一般可以这样找：</p>
+<ol>
+<li>打开收到的邮件；</li>
+<li>点击右上角的“更多”或类似菜单；</li>
+<li>找到“查看原文”“显示原始邮件”“查看邮件头”等选项；</li>
+<li>打开后搜索下面这些关键词。</li>
+</ol>
+<h3 id="3-">3. 重点搜索这些字段</h3>
+<table>
+<thead>
+<tr>
+<th>要搜索的关键词</th>
+<th>可能代表什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Received</code></td>
+<td>邮件经过的服务器记录，最常见</td>
+</tr>
+<tr>
+<td><code>X-Originating-IP</code></td>
+<td>发件人的原始 IP，泄露风险较高</td>
+</tr>
+<tr>
+<td><code>X-Lms-Client-Ip</code></td>
+<td>飞书相关的客户端 IP 字段</td>
+</tr>
+<tr>
+<td><code>Client-IP</code></td>
+<td>可能记录客户端 IP</td>
+</tr>
+<tr>
+<td><code>X-Forwarded-For</code></td>
+<td>可能记录代理前的真实 IP</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4--ip">4. 怎么判断哪个是你的真实 IP？</h3>
+<p>可以用下面的方法判断：</p>
+<ol>
+<li>先查询自己当前的公网 IP；</li>
+<li>再在邮件头里搜索这个 IP；</li>
+<li>如果能直接搜到，说明这个邮箱或发送方式可能泄露了真实 IP；</li>
+<li>如果邮件头里只有邮箱服务商的服务器 IP，一般说明真实 IP 被隐藏了。</li>
+</ol>
+<p>注意：邮件头里的 IP 不一定都是你的 IP，有些是邮件服务商自己的服务器 IP。所以要结合“自己当前公网 IP”和 IP 归属地一起判断。</p>
+<hr />
+<h2 id="heading-1">四、实测结果总表</h2>
+<table>
+<thead>
+<tr>
+<th>邮件服务</th>
+<th>官方客户端 / 网页端</th>
+<th>第三方 SMTP 客户端</th>
+<th>可能额外泄露的信息</th>
+<th>简单评价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iCloud 国际版</td>
+<td>隐藏真实 IP</td>
+<td>隐藏真实 IP</td>
+<td>可能显示计算机名</td>
+<td>隐私表现最好</td>
+</tr>
+<tr>
+<td>iCloud 国内版（云上贵州）</td>
+<td>隐藏真实 IP</td>
+<td>隐藏真实 IP</td>
+<td>可能显示计算机名</td>
+<td>大陆用户更适合</td>
+</tr>
+<tr>
+<td>Outlook.com</td>
+<td>隐藏真实 IP</td>
+<td>会泄露真实 IP</td>
+<td>可能泄露内网 IP</td>
+<td>只建议用官方客户端</td>
+</tr>
+<tr>
+<td>飞书 Lark 国际版</td>
+<td>会泄露真实 IP</td>
+<td>会泄露真实 IP</td>
+<td>可能泄露内网 IP</td>
+<td>不适合隐私敏感邮件</td>
+</tr>
+<tr>
+<td>QQ 邮箱</td>
+<td>会泄露真实 IP</td>
+<td>会泄露真实 IP</td>
+<td>内网 IP、<code>X-Originating-IP</code></td>
+<td>泄露最明显</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="heading-2">五、按邮箱分类说明</h2>
+<h3 id="1-icloud-mail">1. iCloud Mail：最推荐</h3>
+<p>iCloud Mail 的表现最好。</p>
+<p>无论你使用：</p>
+<ul>
+<li>iPhone / Mac 自带邮件客户端；</li>
+<li>iCloud 网页端；</li>
+<li>Foxmail、Thunderbird 等第三方 SMTP 客户端；</li>
+</ul>
+<p>它都能隐藏真实公网 IP 和内网 IP。</p>
+<p>你在邮件头里看到的一般是苹果邮件服务器的 IP，而不是你自己家里、学校、公司或手机网络的真实 IP。</p>
+<p>不过，iCloud 可能会显示你邮件客户端里设置的<strong>计算机名</strong>。这个风险不算高，但最好也改一下。</p>
+<hr />
+<h3 id="2-outlookcom">2. Outlook.com：官方客户端可以，第三方客户端要小心</h3>
+<p>Outlook 的情况比较特殊。</p>
+<table>
+<thead>
+<tr>
+<th>使用方式</th>
+<th>是否推荐</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Outlook 官方客户端 / 网页端</td>
+<td>推荐</td>
+<td>会隐藏真实 IP</td>
+</tr>
+<tr>
+<td>Foxmail、Thunderbird 等第三方 SMTP</td>
+<td>不推荐</td>
+<td>可能泄露真实公网 IP 和内网 IP</td>
+</tr>
+</tbody>
+</table>
+<p>原因很简单：</p>
+<p>Outlook 官方客户端使用的是微软自己的邮件提交方式，服务器会帮你重写邮件头，所以收件人看不到你的真实 IP。</p>
+<p>但如果你用第三方 SMTP 客户端，邮件服务会按标准 SMTP 流程记录连接来源，这时你的真实 IP 就可能被写进邮件头。</p>
+<hr />
+<h3 id="3--lark">3. 飞书 Lark：更偏向企业审计，不偏向个人隐私</h3>
+<p>飞书属于企业协作平台，邮件系统更重视“可追溯”。</p>
+<p>实测中，飞书无论使用官方客户端还是第三方客户端，都可能在邮件头里记录公网 IP 和内网 IP。</p>
+<p>它还可能添加类似 <code>X-Lms-Client-Ip</code> 的字段，用来标注客户端来源。</p>
+<p>所以，如果你非常在意个人 IP 隐私，不建议用飞书邮箱发送敏感邮件。</p>
+<hr />
+<h3 id="4-qq--ip">4. QQ 邮箱：最容易被看到发件 IP</h3>
+<p>QQ 邮箱的邮件头信息比较“透明”。</p>
+<p>它不仅可能在 <code>Received</code> 字段里显示你的 IP，还可能专门添加 <code>X-Originating-IP</code> 字段。</p>
+<p>这个字段的意思基本就是“邮件最初从哪个 IP 发出来”。</p>
+<p>所以，如果你用 QQ 邮箱发送隐私敏感邮件，对方查看邮件原文时，有较大概率看到你的真实网络信息。</p>
+<hr />
+<h2 id="icloud-">六、iCloud 国内版和国际版怎么选？</h2>
+<table>
+<thead>
+<tr>
+<th>对比项目</th>
+<th>iCloud 国际版</th>
+<th>iCloud 国内版（云上贵州）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否隐藏真实公网 IP</td>
+<td>隐藏</td>
+<td>隐藏</td>
+</tr>
+<tr>
+<td>是否隐藏内网 IP</td>
+<td>隐藏</td>
+<td>隐藏</td>
+</tr>
+<tr>
+<td>是否可能显示计算机名</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>第三方 SMTP 是否也隐藏 IP</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>大陆访问速度</td>
+<td>相对较慢</td>
+<td>更快、更稳定</td>
+</tr>
+<tr>
+<td>推荐 SMTP 服务器</td>
+<td><code>smtp.mail.me.com</code></td>
+<td><code>smtp.icloud.com.cn</code></td>
+</tr>
+</tbody>
+</table>
+<p>对中国大陆用户来说，国内版 iCloud 的 SMTP 服务器通常更适合：</p>
+<pre><code class="language-text">SMTP 服务器：smtp.icloud.com.cn
+端口：587
+加密方式：STARTTLS
+登录方式：使用 Apple ID 的应用专用密码
+</code></pre>
+<p>不要直接使用 Apple ID 主密码登录第三方邮件客户端，建议使用应用专用密码。</p>
+<hr />
+<h2 id="icloud--1">七、iCloud 泄露计算机名怎么办？</h2>
+<p>iCloud 虽然隐藏 IP，但可能会保留你在邮件客户端里设置的主机名或计算机名。</p>
+<p>比如邮件头中可能出现类似：</p>
+<pre><code class="language-text">from My-PC
+from MacBook-Pro
+</code></pre>
+<p>如果这个名字包含你的姓名、学校、单位或设备编号，建议修改。</p>
+<h3 id="foxmail-">Foxmail 修改方法</h3>
+<ol>
+<li>打开 Foxmail；</li>
+<li>点击右上角菜单；</li>
+<li>进入“设置”；</li>
+<li>找到“高级”；</li>
+<li>找到“SMTP 发信时使用的主机名”；</li>
+<li>改成普通名称，比如：
+<ul>
+<li><code>iPhone</code></li>
+<li><code>MacBook</code></li>
+<li><code>mail-client</code></li>
+<li>随机字符串；</li>
+</ul>
+</li>
+<li>保存设置后重新发送测试邮件。</li>
+</ol>
+<p>修改后，再查看邮件原文，确认旧的计算机名是否已经消失。</p>
+<hr />
+<h2 id="heading-3">八、不同需求怎么选？</h2>
+<h3 id="1--1">1. 如果你最在意隐私</h3>
+<p>优先选择：</p>
+<ol>
+<li>iCloud Mail；</li>
+<li>Outlook 官方客户端或 Outlook 网页端。</li>
+</ol>
+<p>不要优先选择：</p>
+<ul>
+<li>QQ 邮箱；</li>
+<li>飞书邮箱；</li>
+<li>其他会在邮件头中保留发件 IP 的邮箱。</li>
+</ul>
+<hr />
+<h3 id="2--qq-">2. 如果你必须使用 QQ 邮箱或飞书</h3>
+<p>建议：</p>
+<ul>
+<li>不要用它们发送隐私敏感内容；</li>
+<li>如果一定要发，先使用可信的网络代理或 VPN；</li>
+<li>发完后用“查看邮件原文”的方法复查邮件头；</li>
+<li>不要在电脑名、邮箱昵称、签名里写过多个人信息。</li>
+</ul>
+<p>需要注意：VPN 只能让邮件头显示 VPN 出口 IP，不代表邮件内容本身更安全。邮件内容是否安全，还取决于邮件服务商、传输加密和收件方安全性。</p>
+<hr />
+<h3 id="3--1">3. 如果你只是普通日常发邮件</h3>
+<p>普通学习、工作、注册账号、收验证码等场景，一般不用太紧张。</p>
+<p>但如果你要发送涉及身份、位置、举报、维权、敏感工作材料等内容，就应该优先考虑隐藏 IP 的邮箱和发送方式。</p>
+<hr />
+<h2 id="heading-4">九、快速自查清单</h2>
+<p>发送隐私敏感邮件前，可以按下面清单检查：</p>
+<table>
+<thead>
+<tr>
+<th>检查项目</th>
+<th>是否完成</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否使用 iCloud 或 Outlook 官方客户端？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否避免使用会泄露 IP 的第三方 SMTP？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否查看过测试邮件的完整邮件头？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否搜索过 <code>Received</code>、<code>X-Originating-IP</code> 等字段？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否确认邮件头中没有自己的真实公网 IP？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否修改了会暴露身份的计算机名？</td>
+<td></td>
+</tr>
+<tr>
+<td>是否避免在邮件签名中写过多个人信息？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="heading-5">十、最终建议</h2>
+<p>一句话总结：</p>
+<blockquote>
+<p><strong>想省心保护发件 IP，就用 iCloud Mail；想用 Outlook，就尽量用官方客户端；QQ 邮箱和飞书不适合发送特别注重 IP 隐私的邮件。</strong></p>
+</blockquote>
+<p>这篇文章的重点不是说某个邮箱一定“不安全”，而是提醒你：</p>
+<ul>
+<li>不同邮箱对发件 IP 的处理方式不一样；</li>
+<li>有些邮箱会主动隐藏；</li>
+<li>有些邮箱会完整保留；</li>
+<li>发送敏感邮件前，最好自己查看一次邮件头。</li>
+</ul>
+<p>邮件隐私保护不是只靠“选邮箱”，还要靠良好的使用习惯。</p>
+]]></description>
+      <category>邮箱</category>
+      <category>邮件</category>
+      <category>发信</category>
+    </item>
     <item>
       <title>1Panel + MCSManager 搭建 Minecraft 服务器无法联机的排障记录</title>
       <link>https://ywun365.github.io/post/minecrafe/</link>
@@ -440,57 +824,6 @@ Docker 镜像：eclipse-temurin:21-jre
 <p>静态博客更像是一盘“磁带” 。写在上面的内容安全、稳定，适合作为慢更新的精品内容沉淀平台。<br />
 而动态博客则像是一块“固态硬盘”。读写速度快、交互性强，能满足更高频、更多元化的创作需求。</p>
 ]]></description>
-      <category>博客</category>
-    </item>
-    <item>
-      <title>寻找博客“最优解”：遇见 Gridea</title>
-      <link>https://ywun365.github.io/post/meetgridea/</link>
-      <guid isPermaLink="true">https://ywun365.github.io/post/meetgridea/</guid>
-      <pubDate>Sun, 12 Apr 2026 10:48:56 +0800</pubDate>
-      <description><![CDATA[<p>今天晚上的我异常开心。</p>
-<p>今晚，我终于找到了能完美解决博客建设痛点的工具：<strong>Gridea</strong>。它解决了我的困扰，应该也解决了无数人的痛点。</p>
-<p>我为什么给 Gridea 这款工具极高的评价？因为它简单、易用，写文章不需要任何代码编程知识，更能利用现有的免费平台制作一个属于自己的、永久免费的网站。</p>
-<hr />
-<p>从初中开始，我就萌生了搭建个人博客的想法。奈何当时网上的免费教程难度高得超过了我的想象。我原以为搭建网站只是在某个软件里发布几篇文章，但事实上需要储备很多代码知识，还要部署环境、编辑代码，异常麻烦。</p>
-<p>从初中到大二，我无数次产生过搭建博客的想法，也许多次点开教程，但最终都因流程过于繁琐而选择放弃。</p>
-<p>一般按照正常流程，搭建步骤是这样的：<br />
-<a href="https://tech.yemengstar.com/hexo-tutorial-deploy-githubpages-beginner/">使用 GitHub Pages 部署 Hexo 静态博客网站</a><br />
-你需要在电脑上配置好环境、写好代码、管理好仓库，最后才能托管到平台。</p>
-<p><strong>难，就难在编码这一步。</strong></p>
-<p>大三寒假，我拨出了充足的时间打算正面“迎战”这个挑战。我下载好了相应的编码平台，打开教程视频，对着步骤一步步操作。这一做，就是整整三天。最终，我还是败在了更换主题后出现的代码不匹配 Bug 上。修改这些 Bug 对我来说像是一个过于庞大的工程。</p>
-<p>我再次选择了放弃，只好套用默认主题，通过 Markdown 格式发布了文章。但博客网站终究是搭起来了：<br />
-<a href="https://yanvideo.pages.dev/">岩视频</a></p>
-<p>那是第一次，我按照教程从代码底层开始，一步步修改并搭建好了自己的网站。</p>
-<hr />
-<p>让我第二次产生“好好搭建一个网站”念头的，是前几天看到的一篇文章：<br />
-<a href="https://2x.nz/posts/review-ddos/">https://2x.nz/posts/review-ddos/</a></p>
-<p>为什么我有许多网站却还是想搭建一个新的呢？</p>
-<p>那是因为静态博客网站有着不可替代的优点。我之前的博客大多基于服务器搭建，但受限于服务器的性能和续费压力，许多网站运行时间不长，且访问速度也不够理想。</p>
-<p>而这次的“前端博客”，能有效解决以上所有问题。</p>
-<p>首先，我来科普一下什么是<strong>前端博客</strong>：</p>
-<p>前端博客是一种没有数据库、没有服务器计算，单纯靠网页渲染而成的博客。这意味着你每次新增或修改文章，网站代码都要进行变动并重新部署。这就是为什么传统的前端博客制作起来异常麻烦。</p>
-<p>对于有后端的博客（比如我之前一直在用的 WordPress），自带数据库和管理后台。我可以像在微信公众号后台一样撰写文章，对小白来说非常友好。但“有后端”意味着必须有服务器支撑，用户每次访问都会向数据库请求数据。</p>
-<p>显然，后端网站是绝大多数网站的标配，能实现更多复杂功能。但对于博客来说，或许纯前端页面就已经足够，甚至会带来意想不到的好处：</p>
-<p>前端网页可以免费部署在 GitHub、Cloudflare Workers、Vercel 等知名平台。作为全球互联网的基石，这些大平台能存活的时间往往以百年为单位计算。</p>
-<h3 id="heading">静态网页没有服务器续费的烦恼</h3>
-<p>这是一项“永久免费”的服务，而且异常可靠。只要你的账号还在，代码还在，博客就一直存在。或许等我们老了，我们的博客依然坚挺、年轻，我们的文字会一直记录在上面。</p>
-<h3 id="-ddos-">静态网页能抵御 DDoS 网络攻击</h3>
-<p>有服务器的后端网站，即使套上了 CDN，仍可能因为超额的请求导致服务器崩溃或产生高额账单。静态网站无需担心这些，因为流量会被分布在全球的边缘节点消耗。作为成功抵御过最大 DDoS 攻击的服务商，把静态网页部署在 Cloudflare 基本相当于免疫了此类攻击。</p>
-<h3 id="heading-1">静态网页更安全</h3>
-<p>纯静态、无后台、无数据库、无用户交互，意味着它没有被破解数据库密码或被注入恶意脚本（XSS 攻击）的风险，安全性极高。</p>
-<hr />
-<p><strong>Gridea 的出现，将这一切变得触手可及。</strong></p>
-<p>它的精妙之处在于，能直接连接你的代码仓库，将复杂的代码操作变成了一个可视化、可交互的平台。你在 APP 里面增减文章，它会自动帮你修改代码并一键部署，你的博客也就顺利更新了。</p>
-<p>这个工具让无数技术小白也能轻松拥有属于自己的博客。就像它官方描述的那样：</p>
-<blockquote>
-<p>“搭建独立博客这件事，在过去一直有个尴尬的矛盾：想写博客的人很多，但现有的工具几乎都是给开发者准备的。Hugo 要你装 Go 环境，在终端跑 hugo new site；Hexo 需要 Node.js + npm，再配一套 Git 部署流程；Jekyll 依赖 Ruby，光是解决 gem 版本冲突就能劝退一半人。它们都是优秀的工具，但对于只想安安静静写点东西的人来说，门槛太高了。</p>
-<p>Gridea 是最早尝试解决这个问题的产品之一——一款开源的静态博客写作客户端，不需要命令行，打开就能写。它成功的证明了一件事：很多人想要自己的博客，只是被技术门槛挡在了门外。”</p>
-</blockquote>
-<p>不到 30 分钟，我就用这款工具搭建了属于自己的永久博客：<strong>安全、稳定、简单</strong>。这也是我兴奋并极力推荐它的原因。</p>
-<p>（注：站内的初始文章是 Gridea 默认预留的，但我感觉写得非常棒！尤其是那篇《都 2026 年了，我们为什么还要写博客》，真的很值得一读。）</p>
-]]></description>
-      <category>Gridea</category>
-      <category>入门</category>
       <category>博客</category>
     </item>
   </channel>
