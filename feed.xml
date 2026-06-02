@@ -6,8 +6,347 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Sun, 31 May 2026 17:31:30 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 18:37:50 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>使用 AI Agent 轻松创建个人博客：从生成代码到上线发布</title>
+      <link>https://ywun365.github.io/post/build-website/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/build-website/</guid>
+      <pubDate>Tue, 02 Jun 2026 18:37:50 +0800</pubDate>
+      <description><![CDATA[<h2 id="heading">一、这篇教程能帮你完成什么？</h2>
+<p>传统搭建博客通常需要自己了解前端框架、主题配置、Git 命令、服务器部署、域名解析等内容。<br />
+现在借助 AI Agent，可以把很多重复性工作交给 AI 处理。你只需要把需求说清楚，并根据提示完成账号授权、仓库创建、域名绑定等关键步骤，就可以比较轻松地搭建一个个人博客。</p>
+<p>简单来说，整个流程可以分为四步：</p>
+<ol>
+<li>用 AI Agent 生成博客项目；</li>
+<li>把博客内容改成自己的信息；</li>
+<li>将代码推送到代码托管平台；</li>
+<li>使用 Pages 类静态托管服务部署上线。</li>
+</ol>
+<hr />
+<h2 id="heading-1">二、需要准备哪些工具？</h2>
+<h3 id="1-ai-agent-">1. AI Agent 工具</h3>
+<p>可以使用类似 WorkBuddy、Codex 等 AI Agent 工具。<br />
+这类工具的作用不是简单聊天，而是可以帮你执行一些开发任务，例如：</p>
+<ul>
+<li>下载或初始化博客项目；</li>
+<li>修改网站标题、页面文案、菜单和主题；</li>
+<li>生成文章文件；</li>
+<li>执行 Git 提交和推送；</li>
+<li>根据报错日志分析问题并尝试修复。</li>
+</ul>
+<h3 id="2-">2. 代码托管平台</h3>
+<p>建议提前准备一个代码仓库，用来保存博客项目代码。常见选择包括：</p>
+<ul>
+<li>Gitee；</li>
+<li>GitHub；</li>
+<li>GitLab；</li>
+<li>其他支持 Git 的代码托管平台。</li>
+</ul>
+<p>如果主要面向国内访问，可以优先考虑 Gitee 或国内云服务商支持的代码源；如果使用海外生态，可以选择 GitHub。</p>
+<h3 id="3-">3. 静态网站托管平台</h3>
+<p>博客如果是静态网站，一般不需要单独购买服务器。可以使用 Pages 类平台进行部署，例如：</p>
+<ul>
+<li>腾讯云 Pages / EdgeOne Pages；</li>
+<li>Cloudflare Pages；</li>
+<li>GitHub Pages；</li>
+<li>Vercel；</li>
+<li>Netlify；</li>
+<li>其他静态网站托管服务。</li>
+</ul>
+<p>需要注意的是，不同平台支持的代码源、免费额度、构建方式和绑定域名规则可能会变化，实际操作时应以平台控制台的当前说明为准。</p>
+<h3 id="4-">4. 域名</h3>
+<p>如果只是测试，可以先用平台提供的默认访问地址。<br />
+如果想让博客看起来更正式，可以绑定自己的域名，例如：</p>
+<pre><code class="language-text">blog.example.com
+www.example.com
+</code></pre>
+<p>绑定域名时，通常需要在域名解析平台添加 CNAME 或 A 记录，具体按照托管平台提示操作即可。</p>
+<hr />
+<h2 id="heading-2">三、整体搭建流程</h2>
+<h3 id="-ai-agent-">第一步：让 AI Agent 初始化博客项目</h3>
+<p>可以先对 AI Agent 发送这样的提示词：</p>
+<pre><code class="language-text">我准备搭建一个可以部署到静态网站托管平台的个人博客网站。
+请你帮我选择一个适合新手维护的静态博客方案，并初始化项目代码。
+要求：页面简洁、加载速度快、支持 Markdown 写文章、后续方便修改标题和菜单。
+</code></pre>
+<p>AI 可能会询问你想使用什么框架或主题。<br />
+如果你没有特殊要求，可以选择比较常见的静态博客方案，例如 Hugo、Hexo、VitePress、Astro 等。</p>
+<p>对于新手来说，选择标准可以简单一点：</p>
+<ul>
+<li>想要传统博客风格：可以选 Hugo 或 Hexo；</li>
+<li>想要文档风格：可以选 VitePress；</li>
+<li>想要更现代的前端体验：可以选 Astro。</li>
+</ul>
+<p>不需要一开始就追求复杂功能，先让网站能正常运行、能写文章、能发布，才是最重要的。</p>
+<hr />
+<h3 id="-ai-">第二步：让 AI 修改网站内容</h3>
+<p>项目生成后，可以继续让 AI Agent 修改网站内容。比如：</p>
+<pre><code class="language-text">请把网站标题改成“Deny 的博客”，副标题改成“记录技术、生活与折腾过程”。
+请把首页介绍写得自然一点，不要太像模板。
+请把导航栏改成：首页、文章、归档、关于。
+</code></pre>
+<p>如果看到页面上还有默认文字，可以继续告诉 AI：</p>
+<pre><code class="language-text">把页面中的“XX”改成“XX”。
+把关于页面改成我的个人介绍，风格自然一点，不要太正式。
+</code></pre>
+<p>建议一次只提一类修改需求，这样 AI 更不容易改错。<br />
+例如先改标题，再改导航，再改首页内容，最后再处理主题颜色和文章页面。</p>
+<hr />
+<h3 id="heading-3">第三步：创建代码仓库</h3>
+<p>在 Gitee、GitHub 或其他代码托管平台中，新建一个仓库。<br />
+仓库名称可以简单一点，例如：</p>
+<pre><code class="language-text">my-blog
+deny-blog
+personal-blog
+</code></pre>
+<p>创建仓库后，复制仓库地址。一般会有两种地址：</p>
+<pre><code class="language-text">HTTPS 地址
+SSH 地址
+</code></pre>
+<p>如果你不熟悉 SSH，可以先使用 HTTPS。<br />
+如果使用 SSH，需要提前配置 SSH 公钥。</p>
+<hr />
+<h3 id="-ai-agent--1">第四步：让 AI Agent 推送代码</h3>
+<p>仓库创建好后，把仓库地址发给 AI Agent，例如：</p>
+<pre><code class="language-text">我已经创建好了代码仓库，仓库地址是：xxx。
+请你把当前博客项目提交并推送到这个仓库。
+</code></pre>
+<p>如果推送失败，常见原因通常有：</p>
+<ul>
+<li>没有配置 Git 用户名和邮箱；</li>
+<li>没有添加 SSH 公钥；</li>
+<li>仓库地址填写错误；</li>
+<li>当前目录不是 Git 项目；</li>
+<li>分支名称不一致，例如 main 和 master 不一致；</li>
+<li>平台需要账号授权或登录验证。</li>
+</ul>
+<p>如果 AI 提示需要 SSH 公钥，可以让它生成或查看当前公钥，然后把公钥复制到代码托管平台的 SSH 公钥设置页面。</p>
+<p>常见提示词如下：</p>
+<pre><code class="language-text">推送失败了，请你根据报错信息判断原因，并告诉我应该怎么处理。
+如果需要配置 SSH 公钥，请一步一步指导我。
+</code></pre>
+<p>添加公钥后，再告诉 AI：</p>
+<pre><code class="language-text">我已经添加好了 SSH 公钥，请继续推送代码。
+</code></pre>
+<p>正常情况下，代码就可以推送到仓库中了。</p>
+<hr />
+<h2 id="-pages-">四、使用 Pages 平台部署博客</h2>
+<p>代码推送完成后，就可以进入静态网站托管平台进行部署。</p>
+<p>一般流程如下：</p>
+<ol>
+<li>登录 Pages 类平台；</li>
+<li>选择“新建项目”或“导入 Git 仓库”；</li>
+<li>绑定代码托管账号；</li>
+<li>选择刚才创建的博客仓库；</li>
+<li>设置构建命令和输出目录；</li>
+<li>启动部署；</li>
+<li>部署成功后访问平台提供的网址。</li>
+</ol>
+<p>不同博客框架的构建命令和输出目录可能不同，常见情况如下：</p>
+<table>
+<thead>
+<tr>
+<th>博客框架</th>
+<th>常见构建命令</th>
+<th>常见输出目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hugo</td>
+<td><code>hugo</code></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td>Hexo</td>
+<td><code>hexo generate</code> 或 <code>npx hexo generate</code></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td>VitePress</td>
+<td><code>npm run docs:build</code></td>
+<td><code>.vitepress/dist</code></td>
+</tr>
+<tr>
+<td>Astro</td>
+<td><code>npm run build</code></td>
+<td><code>dist</code></td>
+</tr>
+<tr>
+<td>Vite 项目</td>
+<td><code>npm run build</code></td>
+<td><code>dist</code></td>
+</tr>
+</tbody>
+</table>
+<p>如果不确定怎么填，可以直接把平台要求填写的页面截图或构建日志发给 AI，让它根据项目文件判断。</p>
+<p>提示词示例：</p>
+<pre><code class="language-text">这是 Pages 平台让我填写的构建配置。
+请你根据当前项目判断构建命令和输出目录应该怎么填。
+</code></pre>
+<hr />
+<h2 id="heading-4">五、绑定自己的域名</h2>
+<p>部署成功后，平台通常会提供一个默认访问地址。<br />
+如果想使用自己的域名，可以在 Pages 平台中找到“自定义域名”或“绑定域名”功能。</p>
+<p>常见步骤如下：</p>
+<ol>
+<li>在 Pages 平台添加自定义域名；</li>
+<li>根据平台提示获取 CNAME 或 A 记录；</li>
+<li>打开域名 DNS 解析管理页面；</li>
+<li>添加对应解析记录；</li>
+<li>等待 DNS 生效；</li>
+<li>回到 Pages 平台完成验证。</li>
+</ol>
+<p>例如你想使用：</p>
+<pre><code class="language-text">blog.example.com
+</code></pre>
+<p>通常需要添加类似这样的解析：</p>
+<pre><code class="language-text">记录类型：CNAME
+主机记录：blog
+记录值：平台提供的目标地址
+</code></pre>
+<p>DNS 生效可能需要几分钟到几十分钟。<br />
+如果刚绑定后打不开，不一定是配置错了，可以稍等一会儿再试。</p>
+<hr />
+<h2 id="heading-5">六、如何写文章？</h2>
+<p>大多数静态博客都使用 Markdown 写文章。<br />
+Markdown 的优点是语法简单，适合长期维护。</p>
+<p>一篇最基础的 Markdown 文章大概长这样：</p>
+<pre><code class="language-markdown">---
+title: 我的第一篇博客
+date: 2026-06-02
+tags:
+  - 博客
+  - AI
+---
+
+# 我的第一篇博客
+
+这是我的第一篇博客文章。
+
+## 为什么要搭建博客？
+
+我希望有一个属于自己的空间，用来记录技术学习、项目实践和生活思考。
+
+## 后续计划
+
+以后我会继续更新博客内容，并逐步完善网站功能。
+</code></pre>
+<p>你可以使用 Typora、VS Code、Obsidian 等工具编辑 <code>.md</code> 文件。<br />
+如果不会写，也可以直接让 AI 帮你生成文章初稿，再根据自己的经历进行修改。</p>
+<p>提示词示例：</p>
+<pre><code class="language-text">请帮我写一篇 Markdown 格式的博客文章，主题是“使用 AI Agent 搭建个人博客”。
+要求语言通俗，结构清晰，适合新手阅读。
+</code></pre>
+<p>写好文章后，可以把文章文件交给 AI Agent，让它帮你放到正确目录，并提交发布。</p>
+<hr />
+<h2 id="heading-6">七、进一步简化：做一个可视化文章管理面板</h2>
+<p>如果你不想每次都手动创建 Markdown 文件，也可以让 AI Agent 帮你做一个简单的文章管理面板。</p>
+<p>可以这样提示：</p>
+<pre><code class="language-text">请帮我做一个本地可视化文章管理面板。
+要求像发 QQ 空间一样简单，可以新增文章、编辑文章、填写标题和标签，保存后自动生成 Markdown 文件。
+</code></pre>
+<p>进一步还可以让 AI 做一个启动器：</p>
+<pre><code class="language-text">请帮我做一个启动器。
+我双击启动器后，可以自动打开文章管理页面，并启动本地预览服务。
+</code></pre>
+<p>这样以后写文章时，只需要双击启动器，进入管理页面，填写标题和正文，再点击保存即可。</p>
+<p>不过需要注意：<br />
+这种管理面板本质上还是在本地生成文章文件，最后仍然需要提交代码并触发部署。<br />
+如果想做到完全自动发布，还需要让 AI 帮你接入 Git 提交、推送和平台部署流程。</p>
+<hr />
+<h2 id="heading-7">八、常见问题与解决方法</h2>
+<h3 id="1-">1. 推送到仓库失败怎么办？</h3>
+<p>先看报错信息。常见原因包括：</p>
+<ul>
+<li>SSH 公钥没有添加；</li>
+<li>仓库地址写错；</li>
+<li>当前分支和远程分支不一致；</li>
+<li>没有 Git 权限；</li>
+<li>网络连接异常。</li>
+</ul>
+<p>可以把完整报错发给 AI：</p>
+<pre><code class="language-text">这是 Git 推送失败的日志，请你分析原因，并给出具体修复步骤。
+</code></pre>
+<hr />
+<h3 id="2-pages-">2. Pages 构建失败怎么办？</h3>
+<p>构建失败通常不是网站彻底坏了，而是构建配置、依赖安装或输出目录有问题。</p>
+<p>常见原因包括：</p>
+<ul>
+<li>构建命令写错；</li>
+<li>输出目录写错；</li>
+<li>Node.js 版本不兼容；</li>
+<li>依赖没有正确安装；</li>
+<li>项目缺少配置文件；</li>
+<li>某些主题或插件报错。</li>
+</ul>
+<p>处理方法很简单：<br />
+把构建日志复制给 AI，让它判断错误位置。</p>
+<p>提示词示例：</p>
+<pre><code class="language-text">这是 Pages 平台的构建失败日志。
+请你分析失败原因，并告诉我应该修改哪个文件、哪一行配置。
+</code></pre>
+<hr />
+<h3 id="3--1">3. 域名绑定后打不开怎么办？</h3>
+<p>可以按下面顺序检查：</p>
+<ol>
+<li>DNS 解析是否添加正确；</li>
+<li>主机记录是否写对，例如 <code>blog</code>、<code>www</code> 或 <code>@</code>；</li>
+<li>CNAME 记录值是否和平台要求一致；</li>
+<li>是否等待了足够的 DNS 生效时间；</li>
+<li>Pages 平台是否已经完成域名验证；</li>
+<li>是否开启了 HTTPS；</li>
+<li>浏览器缓存或本地 DNS 缓存是否影响访问。</li>
+</ol>
+<p>如果不确定，可以把域名解析截图和平台提示截图发给 AI，让它帮你逐项排查。</p>
+<hr />
+<h3 id="4--1">4. 为什么我改了文章，网站没有变化？</h3>
+<p>常见原因有：</p>
+<ul>
+<li>文章没有保存；</li>
+<li>没有提交到 Git；</li>
+<li>没有推送到远程仓库；</li>
+<li>Pages 平台还没有重新构建；</li>
+<li>构建失败；</li>
+<li>浏览器缓存导致旧页面仍然显示。</li>
+</ul>
+<p>可以先检查仓库中是否已经有新的文章文件。<br />
+如果仓库内容已经更新，再去 Pages 平台查看最新一次部署是否成功。</p>
+<hr />
+<h2 id="heading-8">九、新手建议</h2>
+<p>如果你是第一次搭建博客，不建议一开始就追求太复杂的功能。<br />
+可以先完成以下几个基础目标：</p>
+<ul>
+<li>网站能打开；</li>
+<li>首页标题是自己的；</li>
+<li>能发布第一篇文章；</li>
+<li>文章链接正常；</li>
+<li>手机和电脑都能正常访问；</li>
+<li>域名可以正常绑定；</li>
+<li>后续文章可以持续更新。</li>
+</ul>
+<p>等这些基础功能稳定后，再考虑增加评论、搜索、访问统计、文章分类、美化主题等功能。</p>
+<p>搭建个人博客最重要的不是技术有多复杂，而是能长期坚持记录。<br />
+AI Agent 可以帮你降低搭建门槛，但真正让博客有价值的，仍然是你持续输出的内容。</p>
+<hr />
+<h2 id="heading-9">十、总结</h2>
+<p>使用 AI Agent 搭建个人博客的核心不是“完全不懂技术也能一键成功”，而是把复杂步骤拆成可执行的小任务，让 AI 帮你完成代码生成、内容修改、Git 提交和错误排查。</p>
+<p>比较推荐的实践方式是：</p>
+<ol>
+<li>先让 AI 生成一个简单静态博客；</li>
+<li>再修改成自己的标题、导航和页面内容；</li>
+<li>把代码推送到 Gitee、GitHub 等代码仓库；</li>
+<li>使用 Pages 类平台部署上线；</li>
+<li>用 Markdown 持续更新文章；</li>
+<li>遇到报错时，把日志交给 AI 分析。</li>
+</ol>
+<p>只要按照这个流程操作，即使没有太多前端基础，也可以逐步搭建出一个属于自己的个人博客。</p>
+]]></description>
+      <category>博客</category>
+      <category>搭建</category>
+      <category>教程</category>
+    </item>
     <item>
       <title>主流邮件服务 IP 隐私保护实测：哪种邮箱更不容易暴露真实地址？</title>
       <link>https://ywun365.github.io/post/email/</link>
@@ -793,27 +1132,6 @@ Docker 镜像：eclipse-temurin:21-jre
 ]]></description>
       <category>域名</category>
       <category>免费域名</category>
-    </item>
-    <item>
-      <title>繁简之间：发现了一些静态博客的局限性</title>
-      <link>https://ywun365.github.io/post/limitations-of-static-site/</link>
-      <guid isPermaLink="true">https://ywun365.github.io/post/limitations-of-static-site/</guid>
-      <pubDate>Mon, 13 Apr 2026 16:43:34 +0800</pubDate>
-      <description><![CDATA[<p>静态博客相比服务器渲染（动态）博客，确实更安全、更简单。</p>
-<p>它可以轻松应对网络攻击，在面对系统漏洞时也表现得更加稳健。对于一个以记录为主的个人博客来说，静态页面所提供的功能已经足以满足日常需求。</p>
-<p>但万物皆有利弊。</p>
-<p>在深入使用后，我发现静态博客最大的局限在于<strong>设备绑定的不便性</strong>。</p>
-<p>对于我之前的 WordPress 博客，只要在有网络的地方，我就可以随时通过浏览器登录后台管理、发布文章。理论上，只要设备能运行浏览器——哪怕是一块智能手表，都能完成内容的更新。</p>
-<p>但静态博客的逻辑完全不同：<br />
-网站的底层配置、环境和原始代码全都保存在我的本地电脑上。这意味着我无法通过手机随时随地撰写和发布。想要更新页面，必须打开电脑，写完文章后，再将生成的代码推送到代码托管平台。</p>
-<p>作为学生，手机或平板这类“移动设备”才是我们触手可及的生产力工具。<br />
-相比之下，打开电脑的频率其实并不高。虽然我用的是笔记本，但因为它是一款性能较强的游戏本，每天拎着沉重的电脑包穿梭在教室、宿舍和图书馆之间，实在是一件很不方便的事情。</p>
-<hr />
-<p><strong>总结一下：</strong></p>
-<p>静态博客更像是一盘“磁带” 。写在上面的内容安全、稳定，适合作为慢更新的精品内容沉淀平台。<br />
-而动态博客则像是一块“固态硬盘”。读写速度快、交互性强，能满足更高频、更多元化的创作需求。</p>
-]]></description>
-      <category>博客</category>
     </item>
   </channel>
 </rss>
