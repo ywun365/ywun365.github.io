@@ -26,23 +26,23 @@
 <meta name="twitter:image" content="/images/avatar.png">
 
 
-  <title>记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来 | 海底の奇妙观测站</title>
+  <title>记一次 EdgeOne + Cloudflare R2 图床防刷配置 | 海底の奇妙观测站</title>
   
-<meta property="og:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来" />
+<meta property="og:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置" />
 <meta property="og:type" content="article" />
 
 
 <meta name="description" content="今天终于把图床的 CDN 和源站防护方案跑通了。 之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。 所以这次我的目标很">
 <link rel="canonical" href="https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来","url":"https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/","description":"今天终于把图床的 CDN 和源站防护方案跑通了。 之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。 所以这次我的目标很","datePublished":"2026-06-10T16:43:44+08:00","dateModified":"2026-06-10T16:43:44+08:00","author":{"@type":"Person","name":"海底の奇妙观测站"},"publisher":{"@type":"Organization","name":"海底の奇妙观测站"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://ywun365.github.io","name":"海底の奇妙观测站","position":1},{"@type":"ListItem","item":"https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/","name":"记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来","position":2}]}</script>
-<meta property="og:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"记一次 EdgeOne + Cloudflare R2 图床防刷配置","url":"https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/","description":"今天终于把图床的 CDN 和源站防护方案跑通了。 之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。 所以这次我的目标很","datePublished":"2026-06-10T16:43:44+08:00","dateModified":"2026-06-10T17:53:25+08:00","author":{"@type":"Person","name":"海底の奇妙观测站"},"publisher":{"@type":"Organization","name":"海底の奇妙观测站"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://ywun365.github.io","name":"海底の奇妙观测站","position":1},{"@type":"ListItem","item":"https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/","name":"记一次 EdgeOne + Cloudflare R2 图床防刷配置","position":2}]}</script>
+<meta property="og:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置">
 <meta property="og:description" content="今天终于把图床的 CDN 和源站防护方案跑通了。 之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。 所以这次我的目标很">
 <meta property="og:url" content="https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="海底の奇妙观测站">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来">
+<meta name="twitter:title" content="记一次 EdgeOne + Cloudflare R2 图床防刷配置">
 <meta name="twitter:description" content="今天终于把图床的 CDN 和源站防护方案跑通了。 之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。 所以这次我的目标很">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTMCQ2NPX6 "></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-NTMCQ2NPX6 ');</script>
@@ -139,7 +139,7 @@ var _hmt = _hmt || [];
     
 <article class="article-container">
   <header class="article-header">
-    <h1 class="article-title">记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来</h1>
+    <h1 class="article-title">记一次 EdgeOne + Cloudflare R2 图床防刷配置</h1>
     <div class="article-meta">
       
       
