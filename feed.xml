@@ -6,8 +6,349 @@
     <description>写点有用的，也写点没用的</description>
     <language>zh-cn</language>
     <generator>Gridea Pro</generator>
-    <lastBuildDate>Tue, 02 Jun 2026 18:37:50 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 16:43:44 +0800</lastBuildDate>
     <atom:link href="https://ywun365.github.io/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>记一次 EdgeOne + Cloudflare R2 图床防刷配置：把 R2 源站藏起来</title>
+      <link>https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/</link>
+      <guid isPermaLink="true">https://ywun365.github.io/post/protect-cloudflare-r2-with-edgeone/</guid>
+      <pubDate>Wed, 10 Jun 2026 16:43:44 +0800</pubDate>
+      <description><![CDATA[<p>今天终于把图床的 CDN 和源站防护方案跑通了。</p>
+<p>之前我的图片是放在 Cloudflare R2 上的。R2 本身很好用，便宜、稳定，也适合做图床存储。但是如果直接把 R2 的公开访问地址暴露出去，就会有一个隐患：别人可以绕过 CDN 直接请求 R2 源站，一旦被恶意刷访问，就可能产生大量读取请求。</p>
+<p>所以这次我的目标很明确：</p>
+<blockquote>
+<p>用户正常访问图片时走 EdgeOne CDN；<br />
+R2 源站不直接暴露；<br />
+直接访问 R2 源站会被 Cloudflare WAF 拦截；<br />
+EdgeOne 回源时带密钥，Cloudflare 校验通过后才允许访问 R2。</p>
+</blockquote>
+<p>最终效果是：</p>
+<pre><code class="language-text">直接访问 R2 源站：被 Cloudflare WAF 拦截
+访问 EdgeOne 图床域名：图片正常打开
+</code></pre>
+<p>这说明配置基本成功了。</p>
+<hr />
+<h2 id="heading">一、整体架构</h2>
+<p>这次的结构大概是这样：</p>
+<pre><code class="language-text">用户
+  ↓
+img2.example.com
+  ↓
+EdgeOne CDN
+  ↓
+R2 自定义源站域名
+  ↓
+Cloudflare R2 Bucket
+</code></pre>
+<p>简单来说：</p>
+<pre><code class="language-text">img2.example.com
+= 对外访问的图床域名
+
+r2-origin.example.com
+= Cloudflare R2 绑定的自定义源站域名，只给 EdgeOne 回源使用
+</code></pre>
+<p>用户访问图片时，只访问：</p>
+<pre><code class="language-text">https://img2.example.com/foot.webp
+</code></pre>
+<p>而不是直接访问 R2 源站。</p>
+<hr />
+<h2 id="cloudflare-r2-url">二、Cloudflare R2：绑定自定义域，不启用公共开发 URL</h2>
+<p>在 Cloudflare R2 存储桶设置里，有两个和公开访问有关的地方：</p>
+<pre><code class="language-text">自定义域
+公共开发 URL
+</code></pre>
+<p>我这次选择的是：</p>
+<pre><code class="language-text">使用自定义域
+不启用公共开发 URL
+</code></pre>
+<p>公共开发 URL 类似：</p>
+<pre><code class="language-text">xxx.r2.dev
+</code></pre>
+<p>这种地址比较适合测试，不太适合长期生产使用。为了后续配合 WAF、隐藏源站和统一访问入口，我没有启用它。</p>
+<p>我给 R2 绑定了一个专门作为源站的自定义域，例如：</p>
+<pre><code class="language-text">r2-origin.example.com
+</code></pre>
+<p>这个域名不直接发给用户，只给 EdgeOne 回源使用。</p>
+<hr />
+<h2 id="cloudflare-waf">三、Cloudflare WAF：没有源站密钥就阻止访问</h2>
+<p>R2 源站域名绑定好以后，关键就是给它加 WAF 规则。</p>
+<p>我的思路是：</p>
+<blockquote>
+<p>如果访问的是 R2 源站域名，并且请求头里没有正确的密钥，就直接阻止。</p>
+</blockquote>
+<p>Cloudflare WAF 自定义规则表达式类似这样：</p>
+<pre><code class="language-text">http.host eq &quot;r2-origin.example.com&quot;
+and not any(http.request.headers[&quot;x-origin-secret&quot;][*] eq &quot;你的随机密钥&quot;)
+</code></pre>
+<p>动作选择：</p>
+<pre><code class="language-text">阻止 / Block
+</code></pre>
+<p>这条规则的意思是：</p>
+<pre><code class="language-text">访问 r2-origin.example.com
+但是没有携带正确的 x-origin-secret 请求头
+就直接拦截
+</code></pre>
+<p>这里的随机密钥建议使用一串足够长的字符串，例如：</p>
+<pre><code class="language-text">r2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</code></pre>
+<p>不要使用太短、太容易猜的值。</p>
+<p>另外要注意，Cloudflare WAF 表达式里请求头名称建议写小写：</p>
+<pre><code class="language-text">x-origin-secret
+</code></pre>
+<p>而 EdgeOne 里可以写成：</p>
+<pre><code class="language-text">X-Origin-Secret
+</code></pre>
+<p>HTTP 请求头本身不区分大小写。</p>
+<hr />
+<h2 id="edgeone">四、EdgeOne：添加图床加速域名</h2>
+<p>接下来在 EdgeOne 里添加加速域名。</p>
+<p>我的对外图床域名是：</p>
+<pre><code class="language-text">img2.example.com
+</code></pre>
+<p>EdgeOne 回源配置大概这样填：</p>
+<pre><code class="language-text">加速域名：
+img2.example.com
+
+源站类型：
+IP/域名
+
+源站地址：
+r2-origin.example.com
+
+回源协议：
+HTTPS
+
+回源端口：
+443
+
+回源 HOST：
+使用源站域名
+</code></pre>
+<p>这里有一个很重要的点：</p>
+<blockquote>
+<p>回源 HOST 不要使用加速域名，而要使用 R2 的源站自定义域名。</p>
+</blockquote>
+<p>也就是说，EdgeOne 对外是：</p>
+<pre><code class="language-text">img2.example.com
+</code></pre>
+<p>但回源时要请求：</p>
+<pre><code class="language-text">r2-origin.example.com
+</code></pre>
+<p>否则 Cloudflare R2 可能无法正确识别源站域名，WAF 规则也可能匹配不上。</p>
+<hr />
+<h2 id="edgeone-1">五、EdgeOne：添加回源请求头</h2>
+<p>因为 Cloudflare WAF 要校验 <code>x-origin-secret</code>，所以 EdgeOne 回源时必须带上同样的请求头。</p>
+<p>在 EdgeOne 规则引擎里添加一条规则：</p>
+<pre><code class="language-text">匹配条件：
+HOST 等于 img2.example.com
+</code></pre>
+<p>然后添加操作：</p>
+<pre><code class="language-text">操作：
+修改 HTTP 回源请求头
+
+类型：
+设置
+
+头部名称：
+X-Origin-Secret
+
+头部值：
+你的随机密钥
+</code></pre>
+<p>注意这里一定要选：</p>
+<pre><code class="language-text">修改 HTTP 回源请求头
+</code></pre>
+<p>不要选成响应头。</p>
+<p>因为这个密钥只应该出现在 EdgeOne 到 Cloudflare R2 的回源请求里，不能暴露给普通用户。</p>
+<p>最终逻辑就是：</p>
+<pre><code class="language-text">普通用户访问 img2.example.com
+→ EdgeOne 接收请求
+→ EdgeOne 回源 R2 时自动带上 X-Origin-Secret
+→ Cloudflare WAF 校验通过
+→ R2 返回图片
+</code></pre>
+<p>而如果别人直接访问 R2 源站：</p>
+<pre><code class="language-text">https://r2-origin.example.com/foot.webp
+</code></pre>
+<p>因为没有这个请求头，就会被 Cloudflare WAF 拦截。</p>
+<hr />
+<h2 id="edgeone-r2-b-">六、EdgeOne：设置强缓存，减少 R2 B 类操作</h2>
+<p>防刷不只是拦源站，还要减少回源。</p>
+<p>因为图床的图片一般上传后不会频繁变化，所以我给图片设置了比较长的节点缓存时间。</p>
+<p>EdgeOne 规则引擎里设置：</p>
+<pre><code class="language-text">匹配条件：
+HOST 等于 img2.example.com
+
+操作：
+节点缓存 TTL
+
+时间：
+30 天
+
+强制缓存：
+开启
+</code></pre>
+<p>如果图片文件名是随机名、哈希名或者日期路径，例如：</p>
+<pre><code class="language-text">/2026/06/foot.webp
+/a8f3c92d.webp
+</code></pre>
+<p>其实也可以把缓存时间设置得更长，比如：</p>
+<pre><code class="language-text">365 天
+</code></pre>
+<p>我目前先设置为 30 天，比较稳妥。</p>
+<p>这样做的好处是：</p>
+<pre><code class="language-text">第一次访问图片：
+EdgeOne 回源 R2，获取图片并缓存
+
+后续访问图片：
+EdgeOne 直接返回缓存，不再回源 R2
+</code></pre>
+<p>这能明显减少 R2 的读取请求，也就是减少 R2 B 类操作压力。</p>
+<hr />
+<h2 id="edgeonecache-key-">七、EdgeOne：Cache Key 忽略查询字符串</h2>
+<p>这个设置也很重要。</p>
+<p>如果 Cache Key 保留全部查询字符串，别人可以这样刷：</p>
+<pre><code class="language-text">https://img2.example.com/foot.webp?a=1
+https://img2.example.com/foot.webp?a=2
+https://img2.example.com/foot.webp?a=3
+</code></pre>
+<p>虽然访问的是同一张图片，但 CDN 可能会把它们当成不同资源，导致缓存命中率下降，甚至增加回源。</p>
+<p>所以我把 Cache Key 设置成：</p>
+<pre><code class="language-text">查询字符串：
+全部忽略
+</code></pre>
+<p>这样：</p>
+<pre><code class="language-text">/foot.webp?a=1
+/foot.webp?a=2
+/foot.webp?a=3
+</code></pre>
+<p>都会被视为同一个缓存资源。</p>
+<p>这对防止恶意随机参数刷缓存很有帮助。</p>
+<hr />
+<h2 id="edgeone-2">八、EdgeOne：浏览器缓存设置</h2>
+<p>除了 EdgeOne 节点缓存，还可以给图片设置浏览器缓存。</p>
+<p>我对常见图片格式设置了浏览器缓存：</p>
+<pre><code class="language-text">jpg
+jpeg
+png
+gif
+bmp
+svg
+webp
+avif
+ico
+</code></pre>
+<p>浏览器缓存时间可以设置为：</p>
+<pre><code class="language-text">7 天
+</code></pre>
+<p>如果图片基本不会替换，也可以设置：</p>
+<pre><code class="language-text">30 天
+</code></pre>
+<p>这样用户重复打开文章或图片时，浏览器本地也能直接使用缓存，访问体验会更好。</p>
+<hr />
+<h2 id="phpjsp-">九、PHP/JSP 等动态后缀不缓存</h2>
+<p>EdgeOne 默认规则里还有一条：</p>
+<pre><code class="language-text">php
+jsp
+asp
+aspx
+</code></pre>
+<p>这些动态脚本后缀不缓存。</p>
+<p>对于 R2 图床来说，这些后缀一般也用不到。保留不缓存规则没什么问题。</p>
+<p>如果想更严格，也可以在安全规则里直接拦截这些后缀访问。</p>
+<hr />
+<h2 id="heading-1">十、最终测试结果</h2>
+<p>配置完成后，我测试了两个地址。</p>
+<h3 id="1--r2-">1. 直接访问 R2 源站</h3>
+<pre><code class="language-text">https://r2-origin.example.com/foot.webp
+</code></pre>
+<p>结果显示：</p>
+<pre><code class="language-text">Sorry, you have been blocked
+</code></pre>
+<p>说明 Cloudflare WAF 已经成功拦截了直接访问源站的请求。</p>
+<p>这一步很关键，说明源站不是裸奔状态。</p>
+<h3 id="2--edgeone-">2. 访问 EdgeOne 图床域名</h3>
+<pre><code class="language-text">https://img2.example.com/foot.webp
+</code></pre>
+<p>图片可以正常打开。</p>
+<p>这说明 EdgeOne 回源时已经成功携带了：</p>
+<pre><code class="language-text">X-Origin-Secret
+</code></pre>
+<p>Cloudflare WAF 校验通过，R2 正常返回图片。</p>
+<p>最终状态就是：</p>
+<pre><code class="language-text">直接访问源站：失败，被 WAF 拦截
+访问 CDN 域名：成功，图片正常显示
+</code></pre>
+<p>这正是我想要的效果。</p>
+<hr />
+<h2 id="heading-2">十一、这套配置能防什么？</h2>
+<p>这套方案主要能解决几个问题：</p>
+<h3 id="1--r2--1">1. 防止别人直连 R2 源站</h3>
+<p>别人即使知道了源站地址，直接打开也会被 Cloudflare WAF 拦截。</p>
+<h3 id="2--r2-b-">2. 减少 R2 B 类操作</h3>
+<p>图片命中 EdgeOne 缓存后，不会每次都回源到 R2。</p>
+<p>这样可以减少 R2 的读取类请求压力。</p>
+<h3 id="3-">3. 防止随机参数刷缓存</h3>
+<p>通过 Cache Key 忽略查询字符串，可以避免别人用 <code>?a=1</code>、<code>?a=2</code> 这类随机参数制造大量不同缓存。</p>
+<h3 id="4-">4. 方便以后迁移</h3>
+<p>对外只暴露：</p>
+<pre><code class="language-text">img2.example.com
+</code></pre>
+<p>以后后端不管换成 R2、S3、对象存储、又拍云还是其他服务，只要保持图片路径不变，用户访问地址就可以尽量不变。</p>
+<hr />
+<h2 id="heading-3">十二、后续还可以继续优化</h2>
+<p>目前基础防护已经跑通，后面还可以继续加几项：</p>
+<pre><code class="language-text">1. EdgeOne 限频规则
+2. 404 状态码缓存
+3. Referer 防盗链
+4. Token 鉴权
+5. HTTPS 强制跳转
+6. 图片压缩与格式转换
+</code></pre>
+<p>其中我比较想继续加的是：</p>
+<pre><code class="language-text">404 状态码缓存
+</code></pre>
+<p>因为很多恶意访问不是刷已有图片，而是乱扫不存在的路径。</p>
+<p>比如：</p>
+<pre><code class="language-text">/test.jpg
+/admin.png
+/upload/1.webp
+/random/abc.jpg
+</code></pre>
+<p>如果这些 404 请求每次都回源，也会消耗源站请求。</p>
+<p>所以后续可以设置：</p>
+<pre><code class="language-text">404 缓存 5 分钟或 10 分钟
+403 缓存 10 分钟
+</code></pre>
+<p>这样乱扫路径时，EdgeOne 可以直接返回缓存的错误状态，不必每次都回源 R2。</p>
+<hr />
+<h2 id="heading-4">十三、总结</h2>
+<p>这次配置的核心不是单纯“套一层 CDN”，而是：</p>
+<pre><code class="language-text">EdgeOne 负责对外访问、缓存和防刷
+Cloudflare WAF 负责保护 R2 源站
+R2 只作为隐藏对象存储源站
+</code></pre>
+<p>最终实现的效果：</p>
+<pre><code class="language-text">用户访问 img2.example.com：正常打开图片
+攻击者直连 R2 源站：被 Cloudflare WAF 拦截
+重复访问图片：尽量命中 EdgeOne 缓存
+随机参数访问：不会轻易刷穿缓存
+</code></pre>
+<p>今天这个小配置还是挺有成就感的。</p>
+<p>从一开始担心 R2 被刷 B 类操作，到最后看到源站被 Cloudflare 拦截、CDN 域名正常打开图片，说明整个链路已经打通了。</p>
+<p>这也让我更清楚地理解了图床防护的重点：</p>
+<blockquote>
+<p>不要让对象存储直接暴露在公网前面，<br />
+不要让所有请求都打到源站，<br />
+对外只暴露 CDN 域名，<br />
+源站只信任 CDN 回源。</p>
+</blockquote>
+<p>这样，一个相对稳妥的 R2 图床防刷方案就完成了。</p>
+]]></description>
+      <category>图床</category>
+      <category>edgeone</category>
+      <category>cloudflare</category>
+    </item>
     <item>
       <title>使用 AI Agent 轻松创建个人博客：从生成代码到上线发布</title>
       <link>https://ywun365.github.io/post/build-website/</link>
@@ -1100,38 +1441,6 @@ Docker 镜像：eclipse-temurin:21-jre
 <p>这次优化虽然改动不大，但通过展示与分析的结合，让博客的数据变得更加“数字化”。看着访问量一点点增长，也是一种独特的成就感。</p>
 ]]></description>
       <category>博客</category>
-    </item>
-    <item>
-      <title> SBTI 刷屏背后的“奇迹”：我申请的免费域名竟然在微信里解封了？</title>
-      <link>https://ywun365.github.io/post/freedomain/</link>
-      <guid isPermaLink="true">https://ywun365.github.io/post/freedomain/</guid>
-      <pubDate>Mon, 13 Apr 2026 20:49:55 +0800</pubDate>
-      <description><![CDATA[<p>最近朋友圈被 SBTI 人格测试刷屏了。点开链接时我惊讶地发现，这个火遍全网的测试网站，使用的竟然是 <code>*.de5.net</code> 结尾的免费三级域名。</p>
-<p>作为一个长期折腾网站的博主，我当时的第一反应是：<strong>这种域名居然能在微信里打开？</strong></p>
-<h3 id="de5net">熟悉的“老朋友”：de5.net</h3>
-<p>我对 <code>de5.net</code> 非常熟悉。它是一个提供免费注册的服务商，用户可以免费申请以 <code>de5.net</code> 结尾的三级域名。</p>
-<p>此前我也申请过一个，但当时的体验只能用“差强人意”来形容：</p>
-<ul>
-<li><strong>国外浏览器</strong>（如 Edge、Firefox）：访问一切正常。</li>
-<li><strong>微信内置浏览器</strong>：打开即报“该网站存在风险”。</li>
-<li><strong>国产手机浏览器</strong>：有很大几率跳出安全警告。</li>
-</ul>
-<h3 id="heading">为什么免费域名总被“针对”？</h3>
-<p>虽然 <code>de5.net</code> 已经加入了 <strong>PSL（Public Suffix List，公共后缀列表）</strong>，理论上可以被 Cloudflare 等平台视作独立域名管理，但在国内很多互联网大厂的风控系统里，它依然被视作一个整体。</p>
-<p>这就导致了严重的<strong>连坐效应</strong>：<br />
-如果有人利用该后缀下的某个子域名搭建了违规网页，微信等平台为了省事，往往会直接拦截整个 <code>de5.net</code> 后缀。结果就是，哪怕你老老实实做内容，也会因为别人的“坏事”而导致你的网站在微信里“见光死”。</p>
-<h3 id="heading-1">意料之外的“解封”</h3>
-<p>这次我抱着怀疑的态度点开了 SBTI 的测试链接，发现竟然能丝滑打开。我随即测试了自己名下的 <code>de5.net</code> 域名，发现原本被封锁的页面竟然也神奇地恢复了访问！</p>
-<p><strong>我想，这大概率是“群众的力量”。</strong></p>
-<p>由于 SBTI 测试热度极高，短时间内涌入了海量用户。当大家发现无法正常进行测评时，大量不知情的网友可能觉得是微信平台“误封”，于是纷纷提交了申诉。在成百上千次的热心反馈压力下，微信后台或许最终对该后缀进行了策略调整，从而实现了这次意外的“普大喜奔”。</p>
-<h3 id="heading-2">未来还会被屏蔽吗？</h3>
-<p>答案恐怕是：<strong>很有可能。</strong></p>
-<p>以老牌免费域名 <code>eu.org</code> 为例，它在微信里的遭遇就是一部“屏蔽、解封、再屏蔽”的循环史。</p>
-<p>究其原因，微信等公司的风控机制更倾向于认可顶级域名列表（TLD）。比如 <code>.com.cn</code> 虽然也是后缀，但因其权威性，不同用户会被认定为独立个体。而像 <code>eu.org</code> 或 <code>de5.net</code> 这类域名，即便进了 PSL 列表，依然在很多平台的信任名单之外。</p>
-<p>只要该后缀下的某一个用户搭建了违规内容，整个域名的生态依然脆弱，随时面临再次被“一锅端”的风险。</p>
-]]></description>
-      <category>域名</category>
-      <category>免费域名</category>
     </item>
   </channel>
 </rss>
